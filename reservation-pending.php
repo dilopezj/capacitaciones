@@ -9,7 +9,8 @@ if($_SESSION['estudiante'] != 0){
 }
 
 $sqlExamenes = "SELECT 
-     ea.id_asignacion,
+      CONCAT(es.id_estudiante,' ', es.nombre,' ', es.apellido) nmb_estudiante,
+    ea.id_asignacion,
     ea.tipo_examen,
     ea.fecha_asignacion,
     e.id_examen,
@@ -36,7 +37,11 @@ $resultadoExamenes = $conn->query($sqlExamenes);
             <thead>
                 <tr class="text-center roboto-medium">
                     <th>EXAMEN</th>
-                    <th>MODULO</th>                                      
+                    <th>MODULO</th> 
+                    <th>DESCRIPCION</th> 
+                   <?php  if($id_estudiante == 0){ ?>
+                    <th>ESTUDIANTE</th> 
+                   <?php } ?>
                     <th>PUNTUACIÓN</th>
                     <th>FECHA HABILITADO</th>  
                     <th>FECHA REALIZADO</th>
@@ -52,13 +57,20 @@ $resultadoExamenes = $conn->query($sqlExamenes);
                         <tr class="text-center" >
                             <td><?php echo $filaExamenes["nombre_examen"] ?></td>
                             <td><?php echo $filaExamenes["nombre_modulo"] ?></td>
+                            <td><?php echo $filaExamenes["descripcion"] ?></td>
+                            <?php  if($id_estudiante == 0){ ?>
+                            <td><?php echo $filaExamenes["nmb_estudiante"] ?></td>
+                            <?php } ?>
                             <td><?php echo $filaExamenes["porcentaje"] ?></td>
                             <td><?php echo $filaExamenes["fecha_asignacion"]  ?></td>
                             <td><?php echo $filaExamenes["fecha_realizacion"]  ?></td>
                             <td> 
-                              <?php if( $filaExamenes["fecha_realizacion"] == "" || $filaExamenes["fecha_realizacion"] == null) { ?>
-                                <button type="button" class="btn btn-raised btn-sm btn-sura" onclick="realizarExamen('<?php echo $filaExamenes["id_examen"] ?>', '<?php echo $filaExamenes["nombre_examen"] ?>')" title="<?php echo $filaExamenes["nombre_examen"] ?>" >Realizar Examen</button>
-                              <?php } ?>
+                              <?php
+                              if($id_estudiante != 0){
+                                if( $filaExamenes["fecha_realizacion"] == "" || $filaExamenes["fecha_realizacion"] == null) { ?>
+                                  <button type="button" class="btn btn-raised btn-sm btn-sura" onclick="realizarExamen('<?php echo $filaExamenes["id_examen"] ?>', '<?php echo $filaExamenes["nombre_examen"] ?>')" title="<?php echo $filaExamenes["nombre_examen"] ?>" >Realizar Examen</button>
+                                <?php } 
+                              }?>
                             </td>
                         </tr>  
                         <?php

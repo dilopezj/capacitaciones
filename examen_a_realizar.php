@@ -1,4 +1,6 @@
-<?php include 'conexion/conexion.php'; ?>
+<?php
+include 'conexion/conexion.php';
+?>
 
 <div class="container-fluid">
     <?php
@@ -52,7 +54,7 @@
                             $cont_r = 1;
                             while ($filaRespuesta = $resultadoRespuestas->fetch_assoc()) {
                                 ?>
-                                <li style="float: left;padding: 38px; border: 1px solid #cccccc;">
+                                <li style="float: left;padding: 38px; border: 1px solid #cccccc; width: 418px; height: 300px;">
                                     <input type="radio" name='<?php echo $filaPregunta["id_pregunta"] ?>' value='<?php echo $filaRespuesta["id_respuesta"] ?>'> <strong>Respuesta<?php echo $cont_r ?>:</strong> <?php echo $filaRespuesta["texto_respuesta"] ?><br>
                                 <?php if ($filaRespuesta["respuesta_imagen"] != "") { ?> 
                                         <img src="./assets/imagen_respuestas/<?php echo $filaRespuesta["respuesta_imagen"] ?>" alt="..." width="200" height="200" class="img-thumbnail">
