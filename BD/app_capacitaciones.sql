@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 02-04-2024 a las 07:54:25
+-- Tiempo de generación: 09-04-2024 a las 15:16:55
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.0.30
 
@@ -85,10 +85,10 @@ CREATE TABLE `examenes` (
 --
 
 INSERT INTO `examenes` (`id_examen`, `nombre_examen`, `descripcion`, `id_modulo`, `tipo_examen`, `fecha_vigencia`, `activo`) VALUES
-(1, 'examen 01', 'lorem impsu', 1, 'antes', '2024-01-10', 1),
-(2, 'Examen 02', '', 2, 'despues', '2024-02-15', 0),
-(3, 'Examen 03', '', 1, 'antes', '2024-01-10', 1),
-(4, 'Examen 04', '', 2, 'despues', '2024-02-15', 0);
+(1, 'TRABAJO EN CONFINADO', 'EVALUACIÓN DE CONOCIMIENTOS PREVIOS', 1, 'antes', '2025-01-01', 1),
+(2, 'TRABAJO EN CONFINADO', 'EVALUACIÓN DE CONOCIMIENTO', 1, 'despues', '2025-01-01', 1),
+(3, 'Examen 03', '', 2, 'antes', '2024-01-10', 1),
+(4, 'Examen 04', '', 2, 'despues', '2024-02-15', 1);
 
 -- --------------------------------------------------------
 
@@ -109,7 +109,8 @@ CREATE TABLE `examenes_asignados` (
 --
 
 INSERT INTO `examenes_asignados` (`id_asignacion`, `id_estudiante`, `id_examen`, `tipo_examen`, `fecha_asignacion`) VALUES
-(1, 1129580584, 1, 'antes', '2024-03-30');
+(1, 1129580584, 1, 'antes', '2024-03-30'),
+(2, 1129580584, 2, 'despues', '2024-04-03');
 
 -- --------------------------------------------------------
 
@@ -136,7 +137,8 @@ INSERT INTO `menus` (`id_menu`, `nombre_menu`, `url_menu`, `nivel`, `padre`) VAL
 (4, 'Examenes pendientes', 'reservation-pending.php', 2, 3),
 (5, 'Modulos', '', 1, 0),
 (6, 'Usuarios', '', 1, 0),
-(7, 'Empresas', '', 1, 0);
+(7, 'Empresas', '', 1, 0),
+(8, 'Asignar examenes', 'reservation-new.php', 2, 3);
 
 -- --------------------------------------------------------
 
@@ -155,7 +157,7 @@ CREATE TABLE `modulos` (
 --
 
 INSERT INTO `modulos` (`id_modulo`, `nombre`, `fecha_vigencia`) VALUES
-(1, 'Módulo 1', '2024-01-01'),
+(1, 'MODULO UAS', '2025-01-01'),
 (2, 'Módulo 2', '2024-02-01');
 
 -- --------------------------------------------------------
@@ -202,7 +204,8 @@ INSERT INTO `permisos` (`id_permiso`, `nombre_permiso`, `id_menu`) VALUES
 (4, 'Examenes pendientes', 4),
 (13, 'Modulos', 5),
 (14, 'Usuarios', 6),
-(15, 'Empresa', 7);
+(15, 'Empresa', 7),
+(16, 'Asignar examenes', 8);
 
 -- --------------------------------------------------------
 
@@ -222,11 +225,16 @@ CREATE TABLE `preguntas` (
 --
 
 INSERT INTO `preguntas` (`id_pregunta`, `id_examen`, `texto_pregunta`, `imagen_url`) VALUES
-(1, 1, '¿Cuál es la capital de Francia?', 'p1.png'),
-(2, 2, '¿Quién escribió \"Don Quijote de la Mancha\"?', 'imagen_url.png'),
-(3, 1, 'Otra Pregunta DOS', NULL),
-(4, 1, 'Otra Pregunta TRES', NULL),
-(5, 1, 'Otra Pregunta CUATRO', NULL);
+(1, 1, '¿Cuál de los siguientes factores NO es un criterio que establece la presencia de\nun espacio confinado?', NULL),
+(2, 1, '¿Cuáles son los métodos para identificar la presencia de atmósferas tóxicas o\nexplosivas dentro de un espacio confinado?', NULL),
+(3, 1, '¿Un espacio confinado con una pequeña abertura y atmosfera toxica, está\ncategorizado como tipo __ y grado __?', NULL),
+(4, 1, '¿Qué peligro NO corresponde a una situación inminente que comprometa la vida o\nla salud de las personas en un espacio confinado clasificado como grado A?', NULL),
+(5, 1, 'En Colombia, ¿Cuáles son reconocidas como medidas preventivas para el trabajo\nen espacios confinados?', NULL),
+(6, 1, '¿Cuál de los siguientes elementos forma parte de las medidas de protección para\ntrabajos en espacios confinados?', NULL),
+(7, 1, '¿Cuál de los siguientes sistemas representa una medida de protección para\ntrabajos en espacios confinados?', NULL),
+(8, 1, '¿Cuál de los siguientes elementos es el más adecuado para bloquear una energía\npeligrosa de una línea presurizada?', NULL),
+(9, 1, 'El control de acceso en los espacios confinados pertenece a:', NULL),
+(10, 1, '¿Qué elemento de los siguientes es una medida preventiva diseñada para\nsalvaguardar al rescatista durante una operación de rescate?', NULL);
 
 -- --------------------------------------------------------
 
@@ -247,19 +255,22 @@ CREATE TABLE `respuestas` (
 --
 
 INSERT INTO `respuestas` (`id_respuesta`, `id_pregunta`, `texto_respuesta`, `correcta`, `imagen_url`) VALUES
-(1, 1, 'París', 1, NULL),
-(2, 1, 'Madrid', 0, NULL),
-(3, 2, 'Miguel de Cervantes', 1, NULL),
-(4, 2, 'Gabriel García Márquez', 0, NULL),
-(5, 1, 'Colombia', 0, NULL),
-(6, 3, 'respuesta 01', 0, 'p6.png'),
-(7, 3, 'respuesta 02', 1, NULL),
-(8, 3, 'respuesta 03', 0, NULL),
-(9, 3, 'respuesta 04', 0, NULL),
-(10, 4, 'respuesta 01', 0, NULL),
-(11, 4, 'respuesta 02', 0, NULL),
-(12, 4, 'respuesta 03', 0, NULL),
-(13, 4, 'respuesta 04', 1, NULL);
+(1, 1, 'Que tengas accesos y salidas restringidas', 0, NULL),
+(2, 1, 'Que sea abierto en su parte superior', 1, NULL),
+(3, 1, 'Que no esté diseñado para la permanencia de una persona', 0, NULL),
+(4, 1, 'Que sea lo suficientemente grande para que un trabajador pueda entrar', 0, NULL),
+(5, 2, 'Utilizando equipos de respiración autónoma.', 0, NULL),
+(6, 2, 'Liberando un ave dentro del espacio.', 0, NULL),
+(7, 2, 'Realizando mediciones estratificadas.', 1, NULL),
+(8, 2, 'Todas las anteriores', 0, NULL),
+(9, 3, 'Tipo 1 Grado A', 0, NULL),
+(10, 3, 'Tipo 2 Grado A', 1, NULL),
+(11, 3, 'Grado 2 Tipo B', 0, NULL),
+(12, 3, 'Grado 2 Tipo C', 0, NULL),
+(13, 4, 'Falta de oxígeno.', 0, NULL),
+(14, 4, 'Presencia de gases tóxicos.', 0, NULL),
+(15, 4, 'Riesgo de incendio repentino.', 0, NULL),
+(16, 4, 'Peligros potenciales como lesiones y/o enfermedades.', 1, NULL);
 
 -- --------------------------------------------------------
 
@@ -283,7 +294,7 @@ CREATE TABLE `respuestas_estudiantes` (
 --
 
 INSERT INTO `respuestas_estudiantes` (`id_respuesta_estudiante`, `id_estudiante`, `id_examen`, `respuestas_correctas`, `respuestas_incorrectas`, `total_preguntas`, `porcentaje`, `fecha_realizacion`) VALUES
-(7, 1129580584, 1, 0, 3, 3, 0, '2024-04-02 04:50:36');
+(8, 1129580584, 1, 3, 1, 4, 75, '2024-04-04 04:41:25');
 
 -- --------------------------------------------------------
 
@@ -330,7 +341,8 @@ INSERT INTO `usuarios_permisos` (`id_usuario_permiso`, `id_perfil`, `id_permiso`
 (5, 1, 3),
 (6, 1, 4),
 (7, 1, 15),
-(8, 1, 13);
+(8, 1, 13),
+(9, 1, 16);
 
 --
 -- Índices para tablas volcadas
@@ -445,13 +457,13 @@ ALTER TABLE `examenes`
 -- AUTO_INCREMENT de la tabla `examenes_asignados`
 --
 ALTER TABLE `examenes_asignados`
-  MODIFY `id_asignacion` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id_asignacion` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT de la tabla `menus`
 --
 ALTER TABLE `menus`
-  MODIFY `id_menu` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `id_menu` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT de la tabla `modulos`
@@ -469,25 +481,25 @@ ALTER TABLE `perfiles`
 -- AUTO_INCREMENT de la tabla `permisos`
 --
 ALTER TABLE `permisos`
-  MODIFY `id_permiso` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
+  MODIFY `id_permiso` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
 
 --
 -- AUTO_INCREMENT de la tabla `preguntas`
 --
 ALTER TABLE `preguntas`
-  MODIFY `id_pregunta` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id_pregunta` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- AUTO_INCREMENT de la tabla `respuestas`
 --
 ALTER TABLE `respuestas`
-  MODIFY `id_respuesta` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+  MODIFY `id_respuesta` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
 
 --
 -- AUTO_INCREMENT de la tabla `respuestas_estudiantes`
 --
 ALTER TABLE `respuestas_estudiantes`
-  MODIFY `id_respuesta_estudiante` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `id_respuesta_estudiante` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT de la tabla `usuarios`
@@ -499,7 +511,7 @@ ALTER TABLE `usuarios`
 -- AUTO_INCREMENT de la tabla `usuarios_permisos`
 --
 ALTER TABLE `usuarios_permisos`
-  MODIFY `id_usuario_permiso` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `id_usuario_permiso` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- Restricciones para tablas volcadas
