@@ -34,7 +34,8 @@
 	<div class="login-container">
 		<div class="login-content">
 			<p class="text-center">
-				<i class="fas fa-user-circle fa-5x"></i>
+				<!-- <i class="fas fa-user-circle fa-5x"></i> -->
+				<img src="assets/img/logo sura color.svg" >
 			</p>
 			<p class="text-center">
 				Inicia sesión con tu cuenta

@@ -3,58 +3,73 @@ session_start();
 
 include 'conexion/conexion.php';
 
-$sqlEmpresas = "SELECT  em.nit, em.nombre empresa, em.departamento, em.municipio_ciudad 
+$sqlEmpresas = "SELECT  em.nit, em.nombre empresa, em.regional, d.departamento, em.ciudad, m.municipio,
+em.direccion, em.telefono, 
+em.nmb_contacto, em.apl_contacto, em.correo_contacto
 FROM empresas em  
-ORDER BY empresa;" ;
+JOIN departamentos d ON d.id_departamento = em.regional
+JOIN municipios m ON m.id_municipio = em.ciudad 
+ORDER BY empresa;";
 
 $resultadoEmpresas = $conn->query($sqlEmpresas);
 ?>
 <!--CONTENT-->
 <div class="container-fluid">
-            <p class="text-center">
-                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#Modalcrear"><i class="fas fa-plus"></i> &nbsp; Agregar Empresa</button>
-                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#ModalArchivo"><i class="fas fa-file"></i> &nbsp; Cargar Excel</button>
-            </p>
+    <p class="text-center">
+        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#Modalcrear"><i
+                class="fas fa-plus"></i> &nbsp; Agregar Empresa</button>
+        <a class="btn btn-link btn-primary" href="archivos/empresas.xlsx" download><i class="fas fa-file"></i> &nbsp;
+            Formato Excel</a>
+        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#ModalArchivo"><i
+                class="fas fa-file"></i> &nbsp; Cargar Excel</button>
+    </p>
     <div class="table-responsive">
-        <table class="table table-dark table-sm">
-            <thead>
-                <tr class="text-center roboto-medium">
-                    <th>#</th>
-                    <th>EMPRESA</th>                    
-                    <th>DEPARTAMENTO</th>
-                    <th>MUNICIPIO / CIUDAD</th>
-                    <th>ELIMINAR</th>
-                </tr>
-            </thead>
-            <tbody>
-            <?php
-                if ($resultadoEmpresas->num_rows > 0) {
-                    // Mostrar las preguntas
-                    while ($filaEmpresas = $resultadoEmpresas->fetch_assoc()) {
-                        ?>
-                <tr class="text-center">
-                    <td><?php echo $filaEmpresas["nit"] ?></td>
-                    <td><?php echo $filaEmpresas["empresa"] ?></td>
-                    <td><?php echo $filaEmpresas["departamento"] ?></td>
-                    <td><?php echo $filaEmpresas["municipio_ciudad"] ?></td>
-                    <td>
-                        <form action="">
-                            <button type="button" class="btn btn-warning">
-                                <i class="far fa-trash-alt"></i>
-                            </button>
-                        </form>
-                    </td>
-                </tr>
-                <?php
+        <fieldset>
+            <table id="example" class="display table table-dark table-sm" style="width:100%">
+                <thead>
+                    <tr class="text-center roboto-medium">
+                        <th>NIT</th>
+                        <th>EMPRESA</th>
+                        <th>DEPARTAMENTO</th>
+                        <th>MUNICIPIO / CIUDAD</th>
+                        <th>DIRECCIÓN</th>
+                        <th>TELEFONO</th>
+                        <th>CONTACTO</th>
+                        <th>CORREO</th>
+                        <th>ELIMINAR</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php
+                    if ($resultadoEmpresas->num_rows > 0) {
+                        // Mostrar las preguntas
+                        while ($filaEmpresas = $resultadoEmpresas->fetch_assoc()) {
+                            $idEmpresa = $filaEmpresas["nit"];
+                            ?>
+                            <tr class="text-center">
+                                <td><?php echo $filaEmpresas["nit"] ?></td>
+                                <td><?php echo $filaEmpresas["empresa"] ?></td>
+                                <td><?php echo $filaEmpresas["departamento"] ?></td>
+                                <td><?php echo $filaEmpresas["municipio"] ?></td>
+                                <td><?php echo $filaEmpresas["direccion"] ?></td>
+                                <td><?php echo $filaEmpresas["telefono"] ?></td>
+                                <td><?php echo $filaEmpresas["nmb_contacto"] . " " . $filaEmpresas["apl_contacto"] ?></td>
+                                <td><?php echo $filaEmpresas["correo_contacto"] ?></td>
+                                <td>
+                                    <button class="btn btn-raised btn-danger btn-md"  onclick="eliminarEmpresa(<?php echo $idEmpresa ?>)">Eliminar</button>
+                                </td>
+                            </tr>
+                            <?php
+                        }
+                    } else {
+                        echo "No hay Empresas disponibles en este momento.";
                     }
-                } else {
-                    echo "No hay Empresas disponibles en este momento.";
-                }
-                ?>      
-                
-            </tbody>
-        </table>
-    </div>    
+                    ?>
+
+                </tbody>
+            </table>
+        </fieldset>
+    </div>
 </div>
 
 <!-- MODAL Crear Empresa -->
@@ -67,8 +82,108 @@ $resultadoEmpresas = $conn->query($sqlEmpresas);
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
-            <div class="modal-body">               
-               
+            <div class="modal-body">
+                <form id="formularioEmpresas" method="post" style="width: 100%;">
+                    <fieldset>
+                        <legend><i class="far fa-building"></i> &nbsp;Formulario Creación de Empresas</legend>
+                        <div class="container-fluid">
+                            <div class="row">
+                                <div class="col-12 col-md-6">
+                                    <div class="form-group">
+                                        <label for="regional">Regional*:</label>
+                                        <select id="regional" name="regional" required class='form-control'
+                                            onchange="changeDpto()">
+                                            <option value="">Seleccione un departamento</option>
+                                            <?php
+                                            // Conexión a la base de datos
+                                            include 'conexion.php';
+                                            // Consulta SQL para obtener los departamentos
+                                            $sqlDpto = "SELECT id_departamento, departamento FROM departamentos ORDER BY departamento";
+                                            $resultadoDpto = $conn->query($sqlDpto);
+                                            if ($resultadoDpto->num_rows > 0) {
+                                                while ($dpto = $resultadoDpto->fetch_assoc()) {
+                                                    echo "<option value='" . $dpto["id_departamento"] . "'>" . $dpto["departamento"] . "</option>";
+                                                }
+                                            }
+                                            ?>
+                                        </select><br><br>
+                                    </div>
+                                </div>
+
+                                <div class="col-12 col-md-6">
+                                    <div class="form-group">
+                                        <label for="ciudad">Ciudad*:</label>
+                                        <select id="ciudad" name="ciudad" required class='form-control'>
+
+                                        </select><br><br>
+                                    </div>
+                                </div>
+
+                                <div class="col-12 col-md-6">
+                                    <div class="form-group">
+                                        <label for="nit">Nit* <small>(Sin puntos y comas)</small>:</label>
+                                        <input type="text" id="nit" name="nit" required class='form-control'><br><br>
+                                    </div>
+                                </div>
+
+                                <div class="col-12 col-md-6">
+                                    <div class="form-group">
+                                        <label for="nmb_empresa">Nombre de Empresa:</label>
+                                        <input type="text" id="nmb_empresa" name="nmb_empresa" required
+                                            class='form-control'><br><br>
+
+                                    </div>
+                                </div>
+
+                                <div class="col-12 col-md-6">
+                                    <div class="form-group">
+                                        <label for="direccion">Dirección:</label>
+                                        <input type="text" id="direccion" name="direccion" required
+                                            class='form-control'><br><br>
+
+                                    </div>
+                                </div>
+
+                                <div class="col-12 col-md-6">
+                                    <div class="form-group">
+                                        <label for="telefono">Teléfono:</label>
+                                        <input type="text" id="telefono" name="telefono" required
+                                            class='form-control'><br><br>
+                                    </div>
+                                </div>
+
+                                <div class="col-12 col-md-12">
+                                    <div class="form-group">
+                                        <label for="correo">Correo:</label>
+                                        <input type="text" id="correo" name="correo" required
+                                            class='form-control'><br><br>
+                                    </div>
+                                </div>
+
+                                <div class="col-12 col-md-6">
+                                    <div class="form-group">
+                                        <label for="nmb_contacto">Nombre Contacto:</label>
+                                        <input type="text" id="nmb_contacto" name="nmb_contacto" required
+                                            class='form-control'><br><br>
+                                    </div>
+                                </div>
+
+                                <div class="col-12 col-md-6">
+                                    <div class="form-group">
+                                        <label for="apl_contacto">Apellido Contacto:</label>
+                                        <input type="text" id="apl_contacto" name="apl_contacto" required
+                                            class='form-control'><br><br>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </fieldset>
+                    <p class="text-center" style="margin-top: 40px;">
+                        <button type="submit" onclick="crearEmpresa()"
+                            class="btn btn-raised btn-success btn-md">Guardar</button>
+                    </p>
+                </form>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
@@ -89,7 +204,20 @@ $resultadoEmpresas = $conn->query($sqlEmpresas);
                 </button>
             </div>
             <div class="modal-body">
-                
+                <form id="formArchivo" method="post" enctype="multipart/form-data">
+                    <fieldset>
+                        <legend><i class="far fa-building"></i> &nbsp;Cargar archivo de Empresas</legend>
+                        <div class="container-fluid">
+                            <div class="form-group">
+                                <label for="archivo">Seleccionar archivo:</label>
+                                <input type="file" class="form-control form-control-file" id="archivo" name="archivo"
+                                    accept=".xlsx,.csv">
+                            </div>
+                            <button type="button" class="btn btn-primary" onclick="cargarArchivoEmp()">Cargar
+                                Archivo</button>
+                        </div>
+                    </fieldset>
+                </form>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
@@ -97,6 +225,3 @@ $resultadoEmpresas = $conn->query($sqlEmpresas);
         </div>
     </div>
 </div>
-
-
-

@@ -10,19 +10,25 @@ if (!isset($_SESSION['id_usuario'])) {
 ?>
 <!DOCTYPE html>
 <html lang="es">
-    <?php include './components/head.html'; ?>
-    <body>
-        <!-- Main container -->
-        <main class="full-box main-container">
-            <?php include './components/sidebar.php'; ?>
-            <!-- Page content -->
-            <section class="full-box page-content">
-                <?php include './components/header.html'; ?>
-                <div id="contenido-importado">
-                    <?php //include './menu.php'; ?>
-                </div> 
-            </section>           
-        </main>
-        <?php include './components/footer.html'; ?>
-    </body>
+<?php include './components/head.html'; ?>
+
+<body>
+    <!-- Main container -->
+    <main class="full-box main-container">
+        <?php include './components/sidebar.php'; ?>
+        <!-- Page content -->
+        <section class="full-box page-content">
+            <?php include './components/header.html'; ?>
+            <div id="contenido-importado">
+                <?php  
+                if($_SESSION['id_perfil'] == 2){
+                    include './menu.php';
+                }
+                ?>
+            </div>
+        </section>
+    </main>
+    <?php include './components/footer.html'; ?>    
+</body>
+
 </html>

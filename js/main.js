@@ -51,7 +51,7 @@ $(document).ready(function () {
     });
 
 });
-(function ($) {
+(function ($) {    
     $(window).on("load", function () {
         $(".nav-lateral-content").mCustomScrollbar({
             theme: "light-thin",
@@ -64,6 +64,7 @@ $(document).ready(function () {
             scrollbarPosition: "inside",
             autoHideScrollbar: true,
             scrollButtons: {enable: true}
-        });
+        });        
     });
 })(jQuery);
+

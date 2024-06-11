@@ -7,11 +7,15 @@ session_start();
 $usuario = $_POST['usuario'];
 $contrasena = $_POST['contrasena'];
 
+// Hash de la contraseña
+$contrasena_hash = hash('sha256', $contrasena); // Puedes utilizar otro algoritmo de hash si prefieres
+
+
 // Consulta SQL para verificar las credenciales del usuario
-$sql = "SELECT id_usuario, correo_usuario, nombre_usuario, u.id_perfil, p.nombre_perfil, u.estudiante "
+$sql = "SELECT id_usuario, correo_usuario, nombre_usuario, u.id_perfil, p.nombre_perfil, u.identificacion "
         . " FROM usuarios u, perfiles p"
-        . " WHERE nombre_usuario = '$usuario' AND contrasena_usuario = '$contrasena'"
-        . "       AND p.id_perfil = u.id_perfil";
+        . " WHERE nombre_usuario = '$usuario' AND contrasena_usuario = '$contrasena_hash'"
+        . "       AND p.id_perfil = u.id_perfil and u.activo = 1 ";
 $resultado = $conn->query($sql);
 
 if ($resultado->num_rows == 1) {
@@ -24,7 +28,7 @@ if ($resultado->num_rows == 1) {
     $_SESSION['correo_usuario'] = $fila['correo_usuario'];
     $_SESSION['id_perfil'] = $fila['id_perfil'];
     $_SESSION['nombre_perfil'] = $fila['nombre_perfil'];
-    $_SESSION['estudiante'] = $fila['estudiante'];
+    $_SESSION['identificacion'] = $fila['identificacion'];
 
     echo 1; // Mensaje de éxito
     
