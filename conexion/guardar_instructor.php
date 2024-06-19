@@ -12,7 +12,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $documento = $_POST['documento'];
     $nombres = $_POST['nombres'];
     $apellidos = $_POST['apellidos'];
-    $genero = $_POST['genero'];
+    $genero = 1;
     
     $sql = "INSERT INTO instructores (regional, ciudad, tipo_identificacion, identificacion, nombres, apellidos, genero) VALUES (?, ?, ?, ?, ?, ?, ?)";
     $stmt = $conn->prepare($sql);

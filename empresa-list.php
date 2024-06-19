@@ -36,7 +36,7 @@ $resultadoEmpresas = $conn->query($sqlEmpresas);
                         <th>TELEFONO</th>
                         <th>CONTACTO</th>
                         <th>CORREO</th>
-                        <th>ELIMINAR</th>
+                        <th>ACCIONES</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -56,6 +56,7 @@ $resultadoEmpresas = $conn->query($sqlEmpresas);
                                 <td><?php echo $filaEmpresas["nmb_contacto"] . " " . $filaEmpresas["apl_contacto"] ?></td>
                                 <td><?php echo $filaEmpresas["correo_contacto"] ?></td>
                                 <td>
+                                    <button onclick="btnEditarEmpresa(<?php echo htmlspecialchars(json_encode($filaEmpresas)); ?>)" class="btn btn-raised btn-warning btn-md" data-toggle="modal" data-target="#ModalEditar">Editar</button>
                                     <button class="btn btn-raised btn-danger btn-md"  onclick="eliminarEmpresa(<?php echo $idEmpresa ?>)">Eliminar</button>
                                 </td>
                             </tr>
@@ -217,6 +218,128 @@ $resultadoEmpresas = $conn->query($sqlEmpresas);
                                 Archivo</button>
                         </div>
                     </fieldset>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Agrega un modal para la edición de usuarios -->
+<!-- MODAL Crear Examen -->
+<div class="modal fade" id="ModalEditar" tabindex="-1" role="dialog" aria-labelledby="ModalEditar" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="Modalcrear">Editar Empresa</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="formularioUsuariosE" method="post" style="width: 100%;">
+                    <input type="hidden" id="idUsuarioE" name="idEmpresaE" required >
+                    <fieldset>
+                        <legend><i class="far fa-building"></i> &nbsp;Formulario Modificación de Empresas</legend>
+                        <div class="container-fluid">
+                            <div class="row">
+                                <div class="col-12 col-md-6">
+                                    <div class="form-group">
+                                        <label for="regional">Regional*:</label>
+                                        <select id="regionalE" name="regionalE" required class='form-control'
+                                            onchange="changeDpto()">
+                                            <option value="">Seleccione un departamento</option>
+                                            <?php
+                                            // Conexión a la base de datos
+                                            include 'conexion.php';
+                                            // Consulta SQL para obtener los departamentos
+                                            $sqlDpto = "SELECT id_departamento, departamento FROM departamentos ORDER BY departamento";
+                                            $resultadoDpto = $conn->query($sqlDpto);
+                                            if ($resultadoDpto->num_rows > 0) {
+                                                while ($dpto = $resultadoDpto->fetch_assoc()) {
+                                                    echo "<option value='" . $dpto["id_departamento"] . "'>" . $dpto["departamento"] . "</option>";
+                                                }
+                                            }
+                                            ?>
+                                        </select><br><br>
+                                    </div>
+                                </div>
+
+                                <div class="col-12 col-md-6">
+                                    <div class="form-group">
+                                        <label for="ciudadE">Ciudad*:</label>
+                                        <select id="ciudadE" name="ciudadE" required class='form-control'>
+
+                                        </select><br><br>
+                                    </div>
+                                </div>
+
+                                <div class="col-12 col-md-6">
+                                    <div class="form-group">
+                                        <label for="nitE">Nit* <small>(Sin puntos y comas)</small>:</label>
+                                        <input type="text" id="nitE" name="nitE" required readonly="true" class='form-control'><br><br>
+                                    </div>
+                                </div>
+
+                                <div class="col-12 col-md-6">
+                                    <div class="form-group">
+                                        <label for="nmb_empresaE">Nombre de Empresa:</label>
+                                        <input type="text" id="nmb_empresaE" name="nmb_empresaE" required 
+                                            class='form-control'><br><br>
+
+                                    </div>
+                                </div>
+
+                                <div class="col-12 col-md-6">
+                                    <div class="form-group">
+                                        <label for="direccionE">Dirección:</label>
+                                        <input type="text" id="direccionE" name="direccionE" required
+                                            class='form-control'><br><br>
+
+                                    </div>
+                                </div>
+
+                                <div class="col-12 col-md-6">
+                                    <div class="form-group">
+                                        <label for="telefonoE">Teléfono:</label>
+                                        <input type="text" id="telefonoE" name="telefonoE" required
+                                            class='form-control'><br><br>
+                                    </div>
+                                </div>
+
+                                <div class="col-12 col-md-12">
+                                    <div class="form-group">
+                                        <label for="correoE">Correo:</label>
+                                        <input type="text" id="correoE" name="correoE" required
+                                            class='form-control'><br><br>
+                                    </div>
+                                </div>
+
+                                <div class="col-12 col-md-6">
+                                    <div class="form-group">
+                                        <label for="nmb_contactoE">Nombre Contacto:</label>
+                                        <input type="text" id="nmb_contactoE" name="nmb_contactoE" required
+                                            class='form-control'><br><br>
+                                    </div>
+                                </div>
+
+                                <div class="col-12 col-md-6">
+                                    <div class="form-group">
+                                        <label for="apl_contactoE">Apellido Contacto:</label>
+                                        <input type="text" id="apl_contactoE" name="apl_contactoE" required
+                                            class='form-control'><br><br>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </fieldset>
+                    <p class="text-center" style="margin-top: 40px;">
+                        <button type="submit" onclick="EditarEmpresas()"
+                            class="btn btn-raised btn-success btn-md">Guardar Cambios</button>
+                    </p>
                 </form>
             </div>
             <div class="modal-footer">

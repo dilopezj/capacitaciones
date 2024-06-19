@@ -55,7 +55,7 @@ $resultadoEstudiantes = $conn->query($sqlEstudiantes);
           <th>CORREO</th>
           <th>CURSOS ASIGNADOS</th>
           <th>CURSOS TERMINADOS</th>
-          <th>OPCIONES</th>
+          <th>ACCIONES</th>
         </tr>
       </thead>
       <tbody>
@@ -75,9 +75,9 @@ $resultadoEstudiantes = $conn->query($sqlEstudiantes);
               <td><?php echo $filaEstudiantes["nombre"] ?></td>
               <td><?php echo $filaEstudiantes["apellido"] ?></td>
               <td><?php echo $filaEstudiantes["genero"] ?></td>
-              <td><?php echo $filaEstudiantes["fecha_nac"] ?></td>
+             <!-- <td><?php //echo $filaEstudiantes["fecha_nac"] ?></td> -->
               <td><?php echo $filaEstudiantes["cargo"] ?></td>
-              <td><?php echo $filaEstudiantes["direccion"] ?></td>
+             <!-- <td><?php //echo $filaEstudiantes["direccion"] ?></td> -->
               <td><?php echo $filaEstudiantes["celular"] ?></td>
               <td><?php echo $filaEstudiantes["correo"] ?></td>
               <td><?php echo $filaEstudiantes["modulos_asignados"] ?></td>
@@ -89,9 +89,8 @@ $resultadoEstudiantes = $conn->query($sqlEstudiantes);
                     data-toggle="modal" data-target="#cursosModal">
                     <i class="far fa-file-archive"></i> cursos
                   </button>
-                  <!-- <button type="button" class="btn btn-sm btn-warning" style="float:left;">
-                    <i class="far fa-user-cog"></i> Editar
-                  </button> -->
+                  <button onclick="btnEditarUsuario(<?php echo htmlspecialchars(json_encode($filaUsuarios)); ?>)" class="btn btn-raised btn-warning btn-sm" data-toggle="modal" data-target="#ModalEditar">Editar</button>
+                  <button class="btn btn-raised btn-danger btn-sm"  onclick="eliminarUsuario(<?php echo $idUsuario ?>)">Eliminar</button>
                 </form>
               </td>
             </tr>
@@ -217,13 +216,13 @@ $resultadoEstudiantes = $conn->query($sqlEstudiantes);
                   </div>
                 </div>
 
-                <div class="col-12 col-md-6">
+            <!--    <div class="col-12 col-md-6">
                   <div class="form-group">
                     <label for="fecha_nacimiento">Fecha de Nacimiento:</label>
                     <input type="date" id="fecha_nacimiento" name="fecha_nacimiento" required
                       class='form-control'><br><br>
                   </div>
-                </div>
+                </div>-->
 
                 <div class="col-12 col-md-6">
                   <div class="form-group">
@@ -232,24 +231,24 @@ $resultadoEstudiantes = $conn->query($sqlEstudiantes);
                   </div>
                 </div>
 
-                <div class="col-12 col-md-6">
+              <!--  <div class="col-12 col-md-6">
                   <div class="form-group">
                     <label for="direccion">Dirección:</label>
                     <input type="text" id="direccion" name="direccion" required class='form-control'><br><br>
                   </div>
-                </div>
+                </div> -->
 
                 <div class="col-12 col-md-6">
                   <div class="form-group">
                     <label for="celular">Celular:</label>
-                    <input type="text" id="celular" name="celular" required class='form-control'><br><br>
+                    <input type="text" id="celular" name="celular" class='form-control'><br><br>
                   </div>
                 </div>
 
                 <div class="col-12 col-md-6">
                   <div class="form-group">
                     <label for="correo">Correo:</label>
-                    <input type="email" id="correo" name="correo" required class='form-control'><br><br>
+                    <input type="email" id="correo" name="correo" class='form-control'><br><br>
 
                   </div>
                 </div>

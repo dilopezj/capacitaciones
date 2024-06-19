@@ -31,15 +31,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES["archivo"])) {
         $tdoc_index = array_search('TIPO DOCUMENTO', $rows[0]);
         $doc_index = array_search('N. DOCUMENTO', $rows[0]);
         $nombres_index = array_search('NOMBRES', $rows[0]);
-        $apellidos_index = array_search('APELLIDOS', $rows[0]);
-        $genero_index = array_search('GENERO', $rows[0]);
+        $apellidos_index = array_search('APELLIDOS', $rows[0]);        
         $activo_index = array_search('ACTIVO', $rows[0]);
+        $genero_index = array_search('GENERO',1);
 
 
         // Si la cabecera no contiene los nombres de las columnas esperadas, muestra un error
         if (
             $regional_index === false || $tdoc_index === false || $doc_index === false
-            || $nombres_index === false || $apellidos_index === false || $genero_index === false
+            || $nombres_index === false || $apellidos_index === false 
             || $activo_index === false || $ciudad_index === false
         ) {
             echo "El archivo no tiene el formato esperado.";
@@ -58,9 +58,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES["archivo"])) {
                 $tipo_documento = $rows[$i][$tdoc_index];
                 $documento = $rows[$i][$doc_index];
                 $nombres = $rows[$i][$nombres_index];
-                $apellidos = $rows[$i][$apellidos_index];
-                $genero = $rows[$i][$genero_index];
+                $apellidos = $rows[$i][$apellidos_index];                
                 $activo = $rows[$i][$activo_index];
+                $genero = 1;
 
                 $contrasena_hash = hash('sha256', $documento); // Puedes utilizar otro algoritmo de hash si prefieres
 

@@ -34,8 +34,8 @@ if ($resultado->num_rows == 1) {
     
 } else {
     // Usuario no encontrado o credenciales incorrectas
-    echo "Correo electrónico o contraseña incorrectos";    
-    $_SESSION['error_login'] = "Correo electrónico o contraseña incorrectos";
+    echo "Usuario no encontrado o credenciales incorrectas";    
+    $_SESSION['error_login'] = "Usuario no encontrado o credenciales incorrectas";
     
 }
 

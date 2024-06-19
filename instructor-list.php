@@ -35,8 +35,7 @@ $resultadoInstructor = $conn->query($sqlInstructor);
           <th>TIPO DOCUMENTO</th>
           <th>NOMBRES</th>
           <th>APELLIDOS</th>
-          <th>GENERO</th>
-          <!-- <th>OPCIONES</th> -->
+          <th>ACCIONES</th>
         </tr>
       </thead>
       <tbody>
@@ -53,14 +52,10 @@ $resultadoInstructor = $conn->query($sqlInstructor);
               <td><?php echo $filaInstructor["tipo"] ?></td>
               <td><?php echo $filaInstructor["nombres"] ?></td>
               <td><?php echo $filaInstructor["apellidos"] ?></td>
-              <td><?php echo $filaInstructor["genero"] ?></td>
-               <!--<td>
-                <form action="">
-                  <button type="button" class="btn btn-sm btn-warning" style="float:left;">
-                    <i class="far fa-user-cog"></i> Editar
-                  </button>
-                </form> 
-              </td>-->
+              <td>
+                                <button onclick="btnEditarUsuario(<?php echo htmlspecialchars(json_encode($filaUsuarios)); ?>)" class="btn btn-raised btn-warning btn-md" data-toggle="modal" data-target="#ModalEditar">Editar</button>
+                                <button class="btn btn-raised btn-danger btn-md"  onclick="eliminarUsuario(<?php echo $idUsuario ?>)">Eliminar</button>
+              </td>
             </tr>
             <?php
           }
@@ -166,31 +161,6 @@ $resultadoInstructor = $conn->query($sqlInstructor);
                     <input type="text" id="apellidos" name="apellidos" required class='form-control'><br><br>
                   </div>
                 </div>
-
-                <div class="col-12 col-md-6">
-                  <div class="form-group">
-                    <?php
-                    //**Query genero */
-                    $sqlGenero = "SELECT g.id, g.sigla,g.descripcion from genero g ORDER BY 2 ;";
-                    ?>
-                    <label for="genero">Género:</label>
-                    <select id="genero" name="genero" required class='form-control'>
-                      <option value="">Seleccione un genero</option>
-                      <?php $resultadoGenero = $conn->query($sqlGenero);
-                      if ($resultadoGenero->num_rows > 0) {
-                        // Mostrar las preguntas
-                        while ($genero = $resultadoGenero->fetch_assoc()) {
-                          ?>
-                          <option value="<?php echo $genero["id"] ?>"><?php echo $genero["descripcion"] ?>
-                          </option>
-                          <?php
-                        }
-                      }
-                      ?>
-                    </select><br><br>
-                  </div>
-                </div>            
-
               </div>
             </div>
             <!-- Agrega los demás campos del formulario aquí -->

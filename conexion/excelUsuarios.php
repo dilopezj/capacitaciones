@@ -61,7 +61,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES["archivo"])) {
                         break;
                     case 'ANALISTA':
                         $perfil = 4;
-                        $identificacion = 0; // ¿Esto es intencional?
+                        //$identificacion = 0; // ¿Esto es intencional?
                         break;
                     default:
                         $perfil = 0; // Perfil desconocido, maneja este caso según tus necesidades
