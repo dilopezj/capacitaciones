@@ -99,6 +99,32 @@ function changeDpto() {
       });
 }
 
+function changeDptoE(callback) {
+    var departamentoId = $("#regionalE").val();
+
+    $.ajax({
+        url: 'conexion/obtener_municipios.php', // Ruta de tu script PHP que obtiene los cursos asignados al estudiante
+        method: 'POST',
+        data: {  departamento_id: departamentoId },
+        success: function(response) {
+            if (response.trim() !== '') {
+                // Agregar las opciones al select de ciudades
+                $('#ciudadE').html(response);
+                // Llamar al callback si está definido
+                if (typeof callback === 'function') {
+                    callback();
+                }
+            } else {
+                // Si la respuesta está vacía, mostrar un mensaje
+                $('#ciudadE').html('<option value="">No hay ciudades disponibles</option>');
+            }
+        },
+        error: function() {
+          alert('Error al cargar los cursos asignados.');
+        }
+      });
+}
+
 function crearUsuarios() {
     var form = document.getElementById("formularioUsuarios");
 
@@ -627,3 +653,111 @@ function eliminarEmpresa(idEmpresa) {
         xhr.send(formData);
     }
 }
+
+function btnEditarEmpresa(datos) {
+    // Comprueba si los datos son un objeto
+    if (typeof datos === 'object') {
+        document.getElementById('regionalE').value = datos.regional;
+        changeDptoE(function() {
+            // Este callback se ejecuta después de que changeDptoE() termine
+            document.getElementById('ciudadE').value = datos.ciudadEM;
+        });
+        document.getElementById('nitE').value = datos.nit;
+        document.getElementById('nmb_empresaE').value = datos.empresa;
+        document.getElementById('direccionE').value = datos.direccion;
+        document.getElementById('telefonoE').value = datos.telefono;
+        document.getElementById('correoE').value = datos.correo_contacto;
+        document.getElementById('nmb_contactoE').value = datos.nmb_contacto;
+        document.getElementById('apl_contactoE').value = datos.apl_contacto;
+        
+        // Similar para otros campos del formulario
+        
+        document.getElementById('idEmpresaE').value = datos.nit;
+    } else {
+        console.error("Los datos de la empresa no son un objeto.");
+    }
+}
+
+function EditarEmpresas() {
+    var form = document.getElementById("formularioEmpresasE");
+
+    if (form) {
+        form.addEventListener("submit", function(event) {
+            event.preventDefault();
+
+            var formData = new FormData(form);
+
+            fetch("conexion/editar_empresa.php", {
+                method: "POST",
+                body: formData
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error("Error al enviar el formulario");
+                }
+                return response.text();
+            })
+            .then(data => {
+                console.log(data);
+                alert("Empresa editada exitosamente");
+                form.reset(); // Limpiar el formulario después de enviar
+                // Cierra el modal después de completar la operación
+                var ModalEditar = document.getElementById('ModalEditar');
+                $(ModalEditar).modal('hide');
+                menuReload('empresa-list.php', 'Listar Empresas');   
+                
+            })
+            .catch(error => {
+                console.error("Error:", error);
+                alert("Ha ocurrido un error al enviar el formulario");
+            });
+        });
+    } else {
+        console.error("El formulario no fue encontrado en el documento.");
+    }
+}
+
+   // Función para eliminar empresas seleccionadas
+    function eliminarEmpresasSeleccionadas() {
+        var seleccionados = document.querySelectorAll('.checkEliminar:checked');
+        var idsEliminar = [];
+
+        seleccionados.forEach(function(check) {
+            idsEliminar.push(check.value);
+        });
+
+        if (idsEliminar.length === 0) {
+            alert('Por favor, selecciona al menos una empresa para eliminar.');
+            return;
+        }
+
+        // Confirmar eliminación
+        if (!confirm('¿Estás seguro que deseas eliminar las empresas seleccionadas?')) {
+            return;
+        }
+
+        // Petición AJAX para eliminar
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST', 'conexion/eliminar_empresas_seleccionadas.php', true);
+        xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+        xhr.onload = function() {
+            if (xhr.status === 200) {
+                // Recargar la página o actualizar la tabla de empresas
+                menuReload('empresa-list.php', 'Listar Empresas');  
+            } else {
+                alert('Hubo un problema al eliminar las empresas. Inténtalo de nuevo.');
+            }
+        };
+
+        // Enviar los NITs a eliminar como parámetros
+        var params = 'ids=' + encodeURIComponent(idsEliminar.join(','));
+        xhr.send(params);
+    }
+
+    // Función para seleccionar/deseleccionar todos los checkboxes
+    document.getElementById('checkTodos').addEventListener('change', function() {
+        var checkboxes = document.querySelectorAll('.checkEliminar');
+        checkboxes.forEach(function(checkbox) {
+            checkbox.checked = this.checked;
+        }, this);
+    });

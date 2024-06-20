@@ -3,7 +3,7 @@ session_start();
 
 include 'conexion/conexion.php';
 
-$sqlEmpresas = "SELECT  em.nit, em.nombre empresa, em.regional, d.departamento, em.ciudad, m.municipio,
+$sqlEmpresas = "SELECT  em.nit, em.nombre empresa, em.regional, d.departamento, em.ciudad ciudadEM, m.municipio,
 em.direccion, em.telefono, 
 em.nmb_contacto, em.apl_contacto, em.correo_contacto
 FROM empresas em  
@@ -22,12 +22,15 @@ $resultadoEmpresas = $conn->query($sqlEmpresas);
             Formato Excel</a>
         <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#ModalArchivo"><i
                 class="fas fa-file"></i> &nbsp; Cargar Excel</button>
+        <button type="button" class="btn btn-danger" onclick="eliminarEmpresasSeleccionadas()"><i
+                class="fas fa-trash"></i> &nbsp; Eliminar Seleccionados</button>
     </p>
     <div class="table-responsive">
         <fieldset>
             <table id="example" class="display table table-dark table-sm" style="width:100%">
                 <thead>
                     <tr class="text-center roboto-medium">
+                         <th><input type="checkbox" id="checkTodos"></th> <!-- Checkbox para seleccionar todos -->
                         <th>NIT</th>
                         <th>EMPRESA</th>
                         <th>DEPARTAMENTO</th>
@@ -47,6 +50,7 @@ $resultadoEmpresas = $conn->query($sqlEmpresas);
                             $idEmpresa = $filaEmpresas["nit"];
                             ?>
                             <tr class="text-center">
+                                <td><input type="checkbox" class="checkEliminar" value="<?php echo $idEmpresa; ?>"></td>
                                 <td><?php echo $filaEmpresas["nit"] ?></td>
                                 <td><?php echo $filaEmpresas["empresa"] ?></td>
                                 <td><?php echo $filaEmpresas["departamento"] ?></td>
@@ -239,17 +243,17 @@ $resultadoEmpresas = $conn->query($sqlEmpresas);
                 </button>
             </div>
             <div class="modal-body">
-                <form id="formularioUsuariosE" method="post" style="width: 100%;">
-                    <input type="hidden" id="idUsuarioE" name="idEmpresaE" required >
+                <form id="formularioEmpresasE" method="post" style="width: 100%;">
+                    <input type="hidden" id="idEmpresaE" name="idEmpresaE" required >
                     <fieldset>
                         <legend><i class="far fa-building"></i> &nbsp;Formulario Modificación de Empresas</legend>
                         <div class="container-fluid">
                             <div class="row">
                                 <div class="col-12 col-md-6">
                                     <div class="form-group">
-                                        <label for="regional">Regional*:</label>
+                                        <label for="regionalE">Regional*:</label>
                                         <select id="regionalE" name="regionalE" required class='form-control'
-                                            onchange="changeDpto()">
+                                            onchange="changeDptoE()">
                                             <option value="">Seleccione un departamento</option>
                                             <?php
                                             // Conexión a la base de datos
