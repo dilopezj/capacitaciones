@@ -16,7 +16,11 @@ ea.fecha_programado, ea.salon, ea.asistencia, ea.fecha_asistencia,
 (SELECT re.porcentaje FROM respuestas_estudiantes re WHERE re.id_estudiante = ea.id_estudiante AND re.id_moludo = ea.id_modulo AND re.id_examen = ea.id_examen) porcentaje,
 (SELECT re.fecha_realizacion FROM respuestas_estudiantes re WHERE re.id_estudiante = ea.id_estudiante AND re.id_moludo = ea.id_modulo AND re.id_examen = ea.id_examen) fecha_realizacion,
 (SELECT ri.porcentaje FROM respuestas_instructor ri WHERE ri.id_estudiante = ea.id_estudiante AND ri.id_modulo = ea.id_modulo AND ri.id_examen = ea.id_examen) porcentaje_final,
-       (SELECT ri.fecha_realizado FROM respuestas_instructor ri WHERE ri.id_estudiante = ea.id_estudiante AND ri.id_modulo = ea.id_modulo AND ri.id_examen = ea.id_examen) fecha_realizacion_final
+(SELECT ri.fecha_realizado FROM respuestas_instructor ri WHERE ri.id_estudiante = ea.id_estudiante AND ri.id_modulo = ea.id_modulo AND ri.id_examen = ea.id_examen) fecha_realizacion_final,
+  em.regional, em.ciudad,
+(select d.departamento from departamentos d where d.id_departamento = em.regional)departamento,
+(select mu.municipio from municipios mu where mu.id_municipio = em.ciudad and mu.departamento_id = em.regional)municipio,
+(select s.descripcion from salones s where s.id = ea.salon )salon_desc
 FROM modulos m 
 JOIN examenes e ON e.id_modulo = m.id_modulo
 JOIN examenes_asignados ea ON ea.id_modulo = m.id_modulo AND ea.id_examen = e.id_examen
@@ -49,6 +53,7 @@ $resultadoExamenes = $conn->query($sqlExamenes);
                     <th>FECHA ASISTENCIA</th>
                     <th>PUNTUACIÓN</th>
                     <th>FECHA REALIZADO</th>
+                    <th>REGIONAL/CIUDAD</th>
                     <th></th>
                 </tr>
             </thead>
@@ -62,7 +67,7 @@ $resultadoExamenes = $conn->query($sqlExamenes);
                             <td><?php echo $filaExamenes["empresa"] ?></td>
                             <td><?php echo $filaExamenes["curso"] ?></td>
                             <td><?php echo $filaExamenes["evaluacion"] ?></td>
-                            <td><?php echo $filaExamenes["tipo_examen"] == "FINAL"? "EXAMEN DE CAMPO" : $filaExamenes["tipo_examen"]  ?></td>
+                            <td><?php echo $filaExamenes["tipo_examen"] == "FINAL" ? "EXAMEN DE CAMPO" : $filaExamenes["tipo_examen"] ?></td>
                             <td><?php echo $filaExamenes["id_estudiante"] ?></td>
                             <td><?php echo $filaExamenes["estudiante"] ?></td>
                             <td><?php echo $filaExamenes["fecha_programado"] ?></td>                                                      
@@ -73,27 +78,39 @@ $resultadoExamenes = $conn->query($sqlExamenes);
                                 <td><?php echo $filaExamenes["porcentaje_final"] ?></td>
                                 <td><?php echo $filaExamenes["fecha_realizacion_final"] ?></td>
                             <?php } else { ?>
-                                <td><?php echo $filaExamenes["salon"] ?></td>  
-                                <td><input type="checkbox" onchange="checkAsistencia(this)" class="attendanceCheckbox" data-test-id='<?php echo $filaExamenes["id_examen"] ?>' data-student-id='<?php echo $filaExamenes["id_estudiante"] ?>' <?php echo ($filaExamenes["asistencia"] == 1) ? "checked" : "" ?>></td>
+                                <td><?php echo $filaExamenes["salon_desc"] ?></td>  
+                                <td>
+                                    <?php if (!empty($filaExamenes["fecha_realizacion"])) : ?>
+                                        <input type="checkbox" onchange="checkAsistencia(this)" class="attendanceCheckbox" data-test-id='<?php echo $filaExamenes["id_examen"] ?>' data-student-id='<?php echo $filaExamenes["id_estudiante"] ?>' <?php echo ($filaExamenes["asistencia"] == 1) ? "checked" : "" ?> disabled>
+                                    <?php else : ?>
+                                        <input type="checkbox" onchange="checkAsistencia(this)" class="attendanceCheckbox" data-test-id='<?php echo $filaExamenes["id_examen"] ?>' data-student-id='<?php echo $filaExamenes["id_estudiante"] ?>' <?php echo ($filaExamenes["asistencia"] == 1) ? "checked" : "" ?>>
+                                    <?php endif; ?>
+                                </td>
                                 <td><?php echo $filaExamenes["fecha_asistencia"] ?></td>
                                 <td><?php echo $filaExamenes["porcentaje"] ?></td>
                                 <td><?php echo $filaExamenes["fecha_realizacion"] ?></td>
                             <?php } ?>
+                            <td><?php echo $filaExamenes["departamento"] . "/" . $filaExamenes["municipio"] ?></td>
                             <td>
                                 <form action="">
-                                    <?php if ($_SESSION['id_perfil'] == 3) {
-                                    if ($filaExamenes["tipo_examen"] == 'FINAL' && $filaExamenes["fecha_realizacion_final"] == '') { 
-                                        $id_estudiante_ = $filaExamenes["id_estudiante"] ;
-                                        $id_modulo_ = $filaExamenes["id_modulo"] ;?>
-                                        <button type="button" class="btn btn-raised btn-sm btn-sura"
-                                            onclick="realizarExamen_evaluador('<?php echo $id_estudiante_ ?>', '<?php echo $id_modulo_ ?>')">Realizar</button>
-                                    <?php }
-                                    } ?>
+                                    <?php
+                                    if ($_SESSION['id_perfil'] == 3) {
+                                        if ($filaExamenes["tipo_examen"] == 'FINAL' && $filaExamenes["fecha_realizacion_final"] == '') {
+                                            $id_estudiante_ = $filaExamenes["id_estudiante"];
+                                            $id_modulo_ = $filaExamenes["id_modulo"];
+                                            ?>
+                                            <button type="button" class="btn btn-raised btn-sm btn-sura"
+                                                    onclick="realizarExamen_evaluador('<?php echo $id_estudiante_ ?>', '<?php echo $id_modulo_ ?>')">Realizar</button>
+                                                <?php }
+                                            }
+                                            ?>
                                     <?php if ($_SESSION['id_perfil'] != 2) {
-                                        if ($filaExamenes["fecha_realizacion"] == "" || $filaExamenes["fecha_realizacion"] == null) { ?>
-                                        <button type="button" class="btn btn-raised btn-sm btn-danger">Cargar excel</button>
-                                    <?php }
-                                    } ?>
+                                        if ($filaExamenes["fecha_realizacion"] == "" || $filaExamenes["fecha_realizacion"] == null) {
+                                            ?>
+                                            <button type="button" class="btn btn-raised btn-sm btn-danger">Cargar excel</button>
+                            <?php }
+                        }
+                        ?>
                                 </form>
                             </td>
                         </tr>

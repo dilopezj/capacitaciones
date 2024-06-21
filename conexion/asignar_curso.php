@@ -9,7 +9,7 @@ if (isset($_POST['idEstudiante']) && isset($_POST['idCurso'])) {
     $idCurso = $_POST['idCurso'];
 
     // Verificar si el ID del curso no está vacío
-    if (!empty($idCurso)) {
+    if ($idCurso != "" && $idCurso != null) {
         $sqlSelect = "SELECT e.id_examen FROM examenes e WHERE e.id_modulo = $idCurso ";
         $result = $conn->query($sqlSelect);
 
@@ -42,7 +42,7 @@ if (isset($_POST['idEstudiante']) && isset($_POST['idCurso'])) {
             echo "No se encontraron exámenes asociados a este curso.";
         }
     } else {
-        echo "Error: El ID del curso está vacío.";
+        echo "Error: Debe seleccionar un curso.";
     }
 } else {
     echo "Error: No se recibieron datos del formulario.";

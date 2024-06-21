@@ -412,6 +412,23 @@ function validarCapacidadSalon(salon) {
     });
 }
 
+function deleteInstructor(cont, estudiante, modulo) {   
+    var nmb_estudiante = $('#nmb_estudiante').html(); 
+    $.ajax({
+        url: 'conexion/eliminarComplemento.php', // Ruta de tu script PHP que asigna el curso al estudiante
+        method: 'POST',
+        data: { idEstudiante: estudiante, idCurso: modulo},
+        success: function(response) {
+          alert(response);
+          // Recargar la lista de cursos después de asignar un nuevo curso
+          mostrarCursos(estudiante,nmb_estudiante);
+        },
+        error: function() {
+          alert('Error al asignar el curso.');
+        }
+      });
+}
+
 
 
   

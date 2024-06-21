@@ -52,7 +52,11 @@ if (isset($_POST['idEstudiante'])) {
             echo "<td>" . $row["nombre_examen"] . "</td>";
             echo "<td>" . $tipoExam . "</td>";
             // Agregar select para el instructor
-            echo "<td><select id='instructor".$cont."' name='instructor[]'  class='form-control'>";
+            echo "<td><select id='instructor".$cont."' name='instructor[]'  class='form-control' " ;
+            if ($row["tipo_examen"] == 'INTERMEDIA') {
+                echo ' disabled'; // Añade el atributo disabled
+            }
+            echo " >";
             echo "<option value=''>Seleccionar Instructor</option>";
             // Aquí cargarías dinámicamente los instructores desde la base de datos
             // Por ejemplo, podrías tener un array de instructores obtenido previamente desde la base de datos
@@ -66,11 +70,19 @@ if (isset($_POST['idEstudiante'])) {
             }
             echo "</select></td>";
             // Agregar input para la fecha programada
-           echo "<td><input id='fecha".$cont."' class='form-control' type='date' name='fecha_programada[]' value='" . $row["fecha_programado"] . "' min='" . date("Y-m-d") . "'></td>";
+           echo "<td><input id='fecha".$cont."' class='form-control' type='date' name='fecha_programada[]' value='" . $row["fecha_programado"] . "' min='" . date("Y-m-d") . "'  " ;
+            if ($row["tipo_examen"] == 'INTERMEDIA') {
+                echo ' readonly="true" ';
+            }
+            echo "></td>";
 
             if ($row["tipo_examen"] != 'FINAL') {
                 $cadn = "salon$cont";
-            echo "<td><select id='salon".$cont."' name='salon[]' class='form-control' onchange='validarCapacidadSalon(\"$cadn\")'> ";
+            echo "<td><select id='salon".$cont."' name='salon[]' class='form-control' onchange='validarCapacidadSalon(\"$cadn\")' " ;
+            if ($row["tipo_examen"] == 'INTERMEDIA') {
+               echo ' disabled'; // Añade el atributo disabled
+            }
+            echo " > ";
             echo "<option value=''>Seleccionar Salón</option>";
             // Aquí cargarías dinámicamente los salones desde la base de datos
             // Por ejemplo, podrías tener un array de salones obtenido previamente desde la base de datos
@@ -86,9 +98,15 @@ if (isset($_POST['idEstudiante'])) {
                 echo "<td>N/A</td>"; // Cambio aquí
             }
             if ($row["tipo_examen"] == 'FINAL') {
-                echo "<td><button class='btn btn-info' type='button' onclick='selectInstructorCampo(".$cont.",".$idEstudiante .",".$row["id_modulo"].")'>Guardar</button></td>"; // Cambio aquí
+                echo "<td><button class='btn btn-info' type='button' onclick='selectInstructorCampo(".$cont.",".$idEstudiante .",".$row["id_modulo"].")' title='Guardar'><i class='fas fa-save'></i></button></td>"; // Cambio aquí
             }else {
-                echo "<td><button class='btn btn-success' type='button' onclick='selectInstructor(".$cont.",".$idEstudiante .",".$row["id_modulo"].")'>Guardar</button></td>"; // Cambio aquí
+                if ($row["tipo_examen"] == 'PREVIA') {
+                echo "<td style='width: 15%;'><button class='btn btn-success btn-sm' type='button' onclick='selectInstructor(".$cont.",".$idEstudiante .",".$row["id_modulo"].")' title='Guardar'><i class='fas fa-save'></i></button>"; 
+                echo "<button class='btn btn-danger btn-sm' type='button' onclick='deleteInstructor(".$cont.",".$idEstudiante .",".$row["id_modulo"].")' title='Eliminar'><i class='fas fa-trash'></i></button></td>"; 
+           
+                }else{
+                     echo "<td></td>"; // 
+                }
             }
            
             echo "</tr>";

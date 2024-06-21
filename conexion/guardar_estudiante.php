@@ -4,42 +4,77 @@ include 'conexion.php';
 // Iniciar sesión (si es necesario)
 session_start();
 
-    // Recibir datos del formulario utilizando FormData
-    $empresa = $_POST['empresa'];
-    $tipo_documento = $_POST['tipo_documento'];
-    $documento = $_POST['documento'];
-    $nombres = $_POST['nombres'];
-    $apellidos = $_POST['apellidos'];
-    $genero = $_POST['genero'];
-    $fecha_nacimiento = $_POST['fecha_nacimiento'];
-    //$edad = $_POST['edad'];
-    $cargo = $_POST['cargo'];
-    $direccion = $_POST['direccion'];
-    $celular = $_POST['celular'];
-    $correo = $_POST['correo'];
+// Recibir datos del formulario utilizando FormData
+$empresa = $_POST['empresa'];
+$tipo_documento = $_POST['tipo_documento'];
+$documento = $_POST['documento'];
+$nombres = $_POST['nombres'];
+$apellidos = $_POST['apellidos'];
+$genero = $_POST['genero'];
+$cargo = $_POST['cargo'];
+$celular = $_POST['celular'];
+$correo = $_POST['correo'];
 
+// Validar si ya existe el correo electrónico en la tabla usuarios
+$sqlVerificarCorreo = "SELECT COUNT(*) as existe FROM usuarios WHERE correo_usuario = ?";
+$stmtVerificarCorreo = $conn->prepare($sqlVerificarCorreo);
+$stmtVerificarCorreo->bind_param("s", $correo);
+$stmtVerificarCorreo->execute();
+$stmtVerificarCorreo->bind_result($existe);
+$stmtVerificarCorreo->fetch();
+$stmtVerificarCorreo->close(); // Cerrar la consulta preparada
+
+if ($existe > 0) {
+    echo "El correo electrónico '$correo' ya está registrado.";
+} else {
     // Consulta SQL para insertar datos en la tabla de estudiantes
-    $sql = "INSERT INTO estudiantes (id_empresa, tipo_identificacion, id_estudiante, nombre, apellido, genero, fecha_nac, edad, cargo, direccion, celular, correo) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    $sqlInsertarEstudiante = "INSERT INTO estudiantes (id_empresa, tipo_identificacion, id_estudiante, nombre, apellido, genero, cargo, celular, correo)
+                              VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
     // Preparar la declaración
-    $stmt = $conn->prepare($sql);
-
-    // Vincular parámetros
-    $stmt->bind_param("isssssissss", $empresa, $tipo_documento, $documento, $nombres, $apellidos, $genero, $fecha_nacimiento,  $cargo, $direccion, $celular, $correo);
-
-    // Ejecutar la consulta
-    if ($stmt->execute()) {
-        $contrasena_hash = hash('sha256', $documento); // Puedes utilizar otro algoritmo de hash si prefieres
-        $sqlUsuario = "INSERT INTO usuarios (nombre_usuario, correo_usuario, contrasena_usuario, id_perfil, identificacion, activo)
-                        VALUES ('$documento','$correo','$contrasena_hash',2,'$documento',1)";
-        $conn->query($sqlUsuario);
-
-        echo "Nuevo estudiante creado exitosamente";
-    } else {
-        echo "Error: " . $sql . "<br>" . $conn->error;
+    $stmtInsertarEstudiante = $conn->prepare($sqlInsertarEstudiante);
+    if ($stmtInsertarEstudiante === false) {
+        die('Error al preparar la consulta: ' . $conn->error);
     }
 
-    // Cerrar la declaración y la conexión
-    $stmt->close();
-    $conn->close();
+    // Vincular parámetros
+    $stmtInsertarEstudiante->bind_param("isssssiss", $empresa, $tipo_documento, $documento, $nombres, $apellidos, $genero, $cargo, $celular, $correo);
+
+    // Ejecutar la consulta de inserción de estudiantes
+    if ($stmtInsertarEstudiante->execute()) {
+        // Generar hash de contraseña (opcional)
+        $contrasena_hash = hash('sha256', $documento); // Puedes utilizar otro algoritmo de hash si prefieres
+
+        // Consulta SQL para insertar usuario
+        $sqlInsertarUsuario = "INSERT INTO usuarios (nombre_usuario, correo_usuario, contrasena_usuario, id_perfil, identificacion, activo)
+                               VALUES (?, ?, ?, 2, ?, 1)";
+
+        // Preparar la declaración
+        $stmtInsertarUsuario = $conn->prepare($sqlInsertarUsuario);
+        if ($stmtInsertarUsuario === false) {
+            die('Error al preparar la consulta: ' . $conn->error);
+        }
+
+        // Vincular parámetros
+        $stmtInsertarUsuario->bind_param("ssss", $documento, $correo, $contrasena_hash, $documento);
+
+        // Ejecutar la consulta de inserción de usuario
+        if ($stmtInsertarUsuario->execute()) {
+            echo "Nuevo estudiante creado exitosamente";
+        } else {
+            echo "Error al crear el usuario: " . $stmtInsertarUsuario->error;
+        }
+
+        // Cerrar la declaración de inserción de usuario
+        $stmtInsertarUsuario->close();
+    } else {
+        echo "Error al insertar estudiante: " . $stmtInsertarEstudiante->error;
+    }
+
+    // Cerrar la declaración de inserción de estudiante y la conexión
+    $stmtInsertarEstudiante->close();
+}
+
+// Cerrar la conexión
+$conn->close();
 ?>

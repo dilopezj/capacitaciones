@@ -30,7 +30,7 @@ $resultadoEmpresas = $conn->query($sqlEmpresas);
             <table id="example" class="display table table-dark table-sm" style="width:100%">
                 <thead>
                     <tr class="text-center roboto-medium">
-                         <th><input type="checkbox" id="checkTodos"></th> <!-- Checkbox para seleccionar todos -->
+                        <th><input type="checkbox" id="checkTodos"></th> <!-- Checkbox para seleccionar todos -->
                         <th>NIT</th>
                         <th>EMPRESA</th>
                         <th>DEPARTAMENTO</th>

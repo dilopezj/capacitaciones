@@ -4,8 +4,22 @@ session_start();
 include 'conexion/conexion.php';
 
 $sqlUsuarios = "SELECT u.id_usuario, u.nombre_usuario, u.correo_usuario, u.id_perfil, p.nombre_perfil, u.identificacion,
-COALESCE((SELECT CONCAT(e.nombre,' ', e.apellido) nmb_estudiante FROM estudiantes e WHERE e.id_estudiante = u.identificacion),'') nmb_estudiante 
-FROM usuarios u JOIN perfiles p ON p.id_perfil = u.id_perfil ";
+    CASE 
+        WHEN u.id_perfil = 3 THEN (
+            SELECT CONCAT(i.nombres, ' ', i.apellidos) 
+            FROM instructores i 
+            WHERE i.identificacion = u.identificacion
+        )
+        ELSE COALESCE((
+            SELECT CONCAT(e.nombre, ' ', e.apellido) 
+            FROM estudiantes e 
+            WHERE e.id_estudiante = u.identificacion
+        ), '') 
+    END AS nmb_estudiante
+FROM 
+    usuarios u
+JOIN 
+    perfiles p ON p.id_perfil = u.id_perfil ";
 if ($_SESSION['id_perfil'] != "1" && $_SESSION['id_perfil'] != "4") {
     $sqlUsuarios .= " WHERE p.id_perfil in (2) ";
 }
@@ -119,7 +133,7 @@ $resultadoUsuarios = $conn->query($sqlUsuarios);
                                         //**Query genero */
                                         if ($_SESSION['id_perfil'] == 1) {
                                             $sqlPerfil = "SELECT p.id_perfil, p.nombre_perfil from perfiles p
-                                        WHERE p.id_perfil IN (1,4) ORDER BY 2 ;";
+                                        WHERE p.id_perfil IN (1,4,3) ORDER BY 2 ;";
                                         } else {
                                             $sqlPerfil = "SELECT p.id_perfil, p.nombre_perfil from perfiles p
                                             WHERE p.id_perfil IN (4) ORDER BY 2 ;";
@@ -195,7 +209,7 @@ $resultadoUsuarios = $conn->query($sqlUsuarios);
 </div>
 
 <!-- Agrega un modal para la edición de usuarios -->
-<!-- MODAL Crear Examen -->
+<!-- MODAL ModalEditar -->
 <div class="modal fade" id="ModalEditar" tabindex="-1" role="dialog" aria-labelledby="ModalEditar" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
