@@ -82,7 +82,14 @@ $resultadoExamenes = $conn->query($sqlExamenes);
                                 <?php if ($id_estudiante == 0) { ?>
                                     <td><?php echo $filaExamenes["nmb_estudiante"] ?></td>
                                 <?php } ?>
-                                <td><?php echo $filaExamenes["porcentaje"] ?></td>
+                                <td><?php
+                                if (is_numeric($filaExamenes["porcentaje"])) {
+                                       echo $rounded_num = round($filaExamenes["porcentaje"], 2); // Round to 2 decimal places
+                                        // Further processing with $rounded_num
+                                    } else {
+                                        echo $filaExamenes["porcentaje"];
+                                    }
+                                   ?></td>
                                 <td><?php echo $filaExamenes["fecha_programado"] ?></td>
                                 <td><?php echo $filaExamenes["salon_desc"] ?></td>
                                 <td><?php echo $filaExamenes["nmb_instructor"] ?></td>
@@ -90,7 +97,7 @@ $resultadoExamenes = $conn->query($sqlExamenes);
                                 <td>
                                     <?php
                                     if ($filaExamenes["tipo_examen"] != 'FINAL') {
-                                        if ($filaExamenes["asistencia"] != 1 && $filaExamenes["asistencia"] !=  null) {
+                                        if ($filaExamenes["asistencia"] != 0 && $filaExamenes["asistencia"] !=  null) {
                                             if ($id_estudiante != 0) {
                                                 if ($filaExamenes["fecha_realizacion"] == "" || $filaExamenes["fecha_realizacion"] == null) {
                                                     $idExamen = $filaExamenes["id_examen"];

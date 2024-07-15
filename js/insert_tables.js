@@ -1032,3 +1032,4 @@ function EditarEstudiantes() {
         console.error("El formulario no fue encontrado en el documento.");
     }
 }
+

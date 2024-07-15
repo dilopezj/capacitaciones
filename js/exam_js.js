@@ -429,6 +429,75 @@ function deleteInstructor(cont, estudiante, modulo) {
       });
 }
 
+function validateDate(selecteDateX, estudiante, modulo) {
+    const selectedDate = document.getElementById(selecteDateX).value; 
+    const studentId = estudiante; 
+    const moduleId = modulo; 
+
+    if (!selectedDate) {
+        alert('Por favor selecciona una fecha válida.');
+        return;
+    }
+
+    $.ajax({
+        url: 'conexion/check_date_conflict.php',
+        method: 'POST',
+        data: { date: selectedDate, studentId: studentId, moduleId: moduleId},
+        success: function(response) {
+           const data = typeof response === 'string' ? JSON.parse(response) : response;
+            if (data.conflict) { // Check the conflict property 
+                alert('La fecha seleccionada ya tiene un examen asignado para otro módulo.');
+                document.getElementById(selecteDateX).value = ''; 
+            }
+        },
+        error: function(xhr, status, error) {
+            console.error('Error:', error);
+        }
+    });
+}
 
 
-  
+function descargarReporte01() {
+    fetch('conexion/export-Reporte01.php')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.blob(); // Convertir la respuesta a un Blob
+        })
+        .then(blob => {
+            const url = window.URL.createObjectURL(blob); // Crear un URL temporal
+            const a = document.createElement('a'); // Crear un enlace
+            a.href = url;
+            a.download = 'reporte01.xlsx'; // Nombre del archivo
+            document.body.appendChild(a);
+            a.click(); // Simular clic para descargar
+            a.remove(); // Limpiar el enlace
+        })
+        .catch(error => {
+            console.error('Error al descargar el archivo:', error);
+        });
+}
+
+function descargarReporte02() {
+    fetch('conexion/export-Reporte02.php')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.blob(); // Convertir la respuesta a un Blob
+        })
+        .then(blob => {
+            const url = window.URL.createObjectURL(blob); // Crear un URL temporal
+            const a = document.createElement('a'); // Crear un enlace
+            a.href = url;
+            a.download = 'reporte02.xlsx'; // Nombre del archivo
+            document.body.appendChild(a);
+            a.click(); // Simular clic para descargar
+            a.remove(); // Limpiar el enlace
+        })
+        .catch(error => {
+            console.error('Error al descargar el archivo:', error);
+        });
+}
+

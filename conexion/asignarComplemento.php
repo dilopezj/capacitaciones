@@ -29,7 +29,7 @@ if (isset($_POST['idEstudiante'])) {
                   FROM examenes_asignados ea
                   INNER JOIN examenes e ON ea.id_examen = e.id_examen
                   WHERE ea.id_modulo = $idCurso 
-                    AND ea.id_estudiante = $estudiante_id";
+                    AND ea.id_estudiante = $estudiante_id and tipo_examen != 'FINAL'";
 
     $result = $conn->query($sqlSelect);
 
@@ -70,7 +70,7 @@ if (isset($_POST['idEstudiante'])) {
                     // Agregar la condición WHERE para actualizar el examen asignado específico
                     $sqlAsignarExamen .= " WHERE id_modulo = $idCurso 
                                            AND id_estudiante = $estudiante_id 
-                                           AND id_examen = $id_examen";
+                                           AND id_examen = $id_examen ";
 
                     // Preparar y ejecutar la consulta de actualización
                     $stmt = $conn->prepare($sqlAsignarExamen);

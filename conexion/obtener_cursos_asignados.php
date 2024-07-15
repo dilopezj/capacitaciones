@@ -27,12 +27,12 @@ if (isset($_POST['idEstudiante'])) {
     $result = $conn->query($sql);
 
     //**Query instructor */
-    $sqlInstructor = "SELECT DISTINCT i.identificacion , concat(i.nombres,' ', i.apellidos) nombre_instructor
+    $sqlInstructor = "SELECT DISTINCT i.identificacion , concat(i.nombres,' ', i.apellidos) nombre_instructor,
+                        (select m.municipio from municipios m where m.departamento_id = i.regional and m.id_municipio = i.ciudad)ciudad
                         FROM instructores i , 
                             empresas em JOIN estudiantes e ON em.nit = e.id_empresa
-                            WHERE i.regional = em.regional AND i.ciudad = em.ciudad
-                            and e.id_estudiante = $idEstudiante
-                            ORDER BY 2 ;";
+                            WHERE  e.id_estudiante = $idEstudiante
+                            ORDER BY 2 ;"; /*i.regional = em.regional AND i.ciudad = em.ciudad and */
 
     //**Query Salones */
     $sqlSalones = "SELECT DISTINCT s.id , s.descripcion, s.capacidad
@@ -65,7 +65,7 @@ if (isset($_POST['idEstudiante'])) {
                 // Mostrar las preguntas
                 while ($instructor = $resultadoInstructor->fetch_assoc()) {
                     $selected = $row["id_instructor"] == $instructor["identificacion"] ? 'selected' : '';
-                    echo "<option value='" . $instructor["identificacion"] . "' $selected  >" . $instructor["nombre_instructor"] . "</option>";
+                    echo "<option value='" . $instructor["identificacion"] . "' $selected  >" . $instructor["nombre_instructor"] . " - " . $instructor["ciudad"] . "</option>";
                 }
             }
             echo "</select></td>";
@@ -73,6 +73,10 @@ if (isset($_POST['idEstudiante'])) {
            echo "<td><input id='fecha".$cont."' class='form-control' type='date' name='fecha_programada[]' value='" . $row["fecha_programado"] . "' min='" . date("Y-m-d") . "'  " ;
             if ($row["tipo_examen"] == 'INTERMEDIA') {
                 echo ' readonly="true" ';
+            }
+            if ($row["tipo_examen"] == 'PREVIA') {
+                $id_moludop = $row["id_modulo"];
+                echo ' onchange="validateDate(\'fecha' . $cont . '\', ' . $idEstudiante . ', ' . $id_moludop . ')" ';
             }
             echo "></td>";
 
