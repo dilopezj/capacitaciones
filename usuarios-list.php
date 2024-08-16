@@ -122,7 +122,7 @@ $resultadoUsuarios = $conn->query($sqlUsuarios);
                                 <div class="col-12 col-md-6">
                                     <div class="form-group">
                                         <label for="correo">Correo:</label>
-                                        <input type="email" id="correo" name="correo" required
+                                        <input type="email" id="correo" name="correo"
                                             class='form-control'><br><br>
 
                                     </div>
@@ -249,7 +249,7 @@ $resultadoUsuarios = $conn->query($sqlUsuarios);
                                 <div class="col-12 col-md-6">
                                     <div class="form-group">
                                         <label for="correo">Correo:</label>
-                                        <input type="email" id="correoE" name="correoE" required 
+                                        <input type="email" id="correoE" name="correoE" 
                                             class='form-control'><br><br>
                                     </div>
                                 </div>

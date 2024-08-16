@@ -68,7 +68,10 @@ $resultadoEstudiantes = $conn->query($sqlEstudiantes);
                         $idestudiante = $filaEstudiantes["id_estudiante"];
                         ?>
                         <tr class="text-center">
-                            <td><input type="checkbox" class="checkEliminar" value="<?php echo $idestudiante; ?>"></td>
+                            <td><?php if($filaEstudiantes["modulos_terminados"] == 0){ ?>      
+                                <input type="checkbox" class="checkEliminar" value="<?php echo $idestudiante; ?>">
+                                <?php } ?>  
+                            </td>
                             <td><?php echo $filaEstudiantes["departamento"] ?></td>
                             <td><?php echo $filaEstudiantes["municipio"] ?></td>
                             <td><?php echo $filaEstudiantes["nit"] ?></td>
@@ -87,8 +90,10 @@ $resultadoEstudiantes = $conn->query($sqlEstudiantes);
                                     <button type="button" class="btn btn-raised btn-sm btn-success"
                                             onclick="mostrarCursos(<?php echo $filaEstudiantes['id_estudiante']; ?>, '<?php echo $nmb_est ?>')"
                                             data-toggle="modal" data-target="#cursosModal">cursos</button>
+                                <?php if($filaEstudiantes["modulos_terminados"] == 0){ ?>            
                                     <button onclick="btnEditarEstudiante(<?php echo htmlspecialchars(json_encode($filaEstudiantes)); ?>)" class="btn btn-raised btn-warning btn-sm" data-toggle="modal" data-target="#ModalEditar">Editar</button>
                                     <button class="btn btn-raised btn-danger btn-sm"  onclick="eliminarEstudiante(<?php echo $idestudiante ?>)">Eliminar</button>
+                                <?php } ?>    
                             </td>
                         </tr>
                         <?php
@@ -338,7 +343,7 @@ $resultadoEstudiantes = $conn->query($sqlEstudiantes);
                             <th>Curso</th>
                             <th>Descripción</th>
                             <th>Tipo</th>
-                            <th>estudiante</th>
+                            <th>Tutor</th>
                             <th>Fecha Asignación</th>
                             <th>Salón</th>
                             <th>  Acciones  </th>

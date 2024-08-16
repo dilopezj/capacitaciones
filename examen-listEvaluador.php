@@ -1,4 +1,5 @@
 <?php
+
 session_start();
 
 include 'conexion/conexion.php';
@@ -16,6 +17,7 @@ ea.fecha_programado, ea.salon, ea.asistencia, ea.fecha_asistencia,
 (SELECT re.porcentaje FROM respuestas_estudiantes re WHERE re.id_estudiante = ea.id_estudiante AND re.id_moludo = ea.id_modulo AND re.id_examen = ea.id_examen) porcentaje,
 (SELECT re.fecha_realizacion FROM respuestas_estudiantes re WHERE re.id_estudiante = ea.id_estudiante AND re.id_moludo = ea.id_modulo AND re.id_examen = ea.id_examen) fecha_realizacion,
 (SELECT ri.porcentaje FROM respuestas_instructor ri WHERE ri.id_estudiante = ea.id_estudiante AND ri.id_modulo = ea.id_modulo AND ri.id_examen = ea.id_examen) porcentaje_final,
+(SELECT ri.porcentaje_empresa FROM respuestas_instructor ri WHERE ri.id_estudiante = ea.id_estudiante AND ri.id_modulo = ea.id_modulo AND ri.id_examen = ea.id_examen) porcentaje_empresa,
 (SELECT ri.fecha_realizado FROM respuestas_instructor ri WHERE ri.id_estudiante = ea.id_estudiante AND ri.id_modulo = ea.id_modulo AND ri.id_examen = ea.id_examen) fecha_realizacion_final,
   em.regional, em.ciudad,
 (select d.departamento from departamentos d where d.id_departamento = em.regional)departamento,
@@ -36,7 +38,7 @@ $resultadoExamenes = $conn->query($sqlExamenes);
 ?>
 <!--CONTENT-->
 <div class="container-fluid">
-    <div><button type="button" class="btn btn-raised btn-sm btn-success" >Descargar Formato Evaluacion</button></div>
+    <div><button type="button" class="btn btn-primary" data-toggle="modal" data-target="#ListExamModulos" >Descargar Formato Evaluacion</button></div>
     <div class="table-responsive">
         <table  id="example" class="display table table-dark table-sm" style="width:auto">
             <thead>
@@ -75,7 +77,11 @@ $resultadoExamenes = $conn->query($sqlExamenes);
                                 <td>N/A</td>  
                                 <td>N/A</td>
                                 <td>N/A</td>
-                                <td><?php echo $filaExamenes["porcentaje_final"] ?></td>
+                                <?php if( $filaExamenes["porcentaje_final"] != null && $filaExamenes["porcentaje_empresa"] != null ){ ?>
+                                 <td><?php echo "Apreciación:" .  $filaExamenes["porcentaje_final"]. "% <br>Verificación Empresa:" .  $filaExamenes["porcentaje_empresa"] ."%" ?></td>
+                                <?php } else { ?>
+                                 <td></td>
+                                <?php } ?>
                                 <td><?php echo $filaExamenes["fecha_realizacion_final"] ?></td>
                             <?php } else { ?>
                                 <td><?php echo $filaExamenes["salon_desc"] ?></td>  
@@ -87,32 +93,33 @@ $resultadoExamenes = $conn->query($sqlExamenes);
                                     <?php endif; ?>
                                 </td>
                                 <td><?php echo $filaExamenes["fecha_asistencia"] ?></td>
-                                <td><?php echo $filaExamenes["porcentaje"] ?></td>
+                                <td><?php echo  $filaExamenes["porcentaje"] != null ? round($filaExamenes["porcentaje"], 2) : $filaExamenes["porcentaje"]  ?></td>
                                 <td><?php echo $filaExamenes["fecha_realizacion"] ?></td>
                             <?php } ?>
                             <td><?php echo $filaExamenes["departamento"] . "/" . $filaExamenes["municipio"] ?></td>
                             <td>
-                                <form action="">
-                                    <?php
-                                    if ($_SESSION['id_perfil'] == 3) {
-                                        if ($filaExamenes["tipo_examen"] == 'FINAL' && $filaExamenes["fecha_realizacion_final"] == '') {
-                                            $id_estudiante_ = $filaExamenes["id_estudiante"];
-                                            $id_modulo_ = $filaExamenes["id_modulo"];
-                                            ?>
-                                            <button type="button" class="btn btn-raised btn-sm btn-sura"
-                                                    onclick="realizarExamen_evaluador('<?php echo $id_estudiante_ ?>', '<?php echo $id_modulo_ ?>')">Realizar</button>
-                                                <?php }
-                                            }
-                                            ?>
-                                    <?php if ($_SESSION['id_perfil'] != 2) {
-                                        if ($filaExamenes["fecha_realizacion"] == "" || $filaExamenes["fecha_realizacion"] == null) {
-                                            ?>
-                                            <button type="button" class="btn btn-raised btn-sm btn-danger">Cargar excel</button>
-                            <?php }
-                        }
-                        ?>
-                                </form>
+                                <?php
+                                if ($_SESSION['id_perfil'] == 3) {
+                                    if ($filaExamenes["tipo_examen"] == 'FINAL' && $filaExamenes["fecha_realizacion_final"] == '') {
+                                        $id_estudiante_ = $filaExamenes["id_estudiante"];
+                                        $id_modulo_ = $filaExamenes["id_modulo"];
+                                        ?>
+                                        <button type="button" class="btn btn-raised btn-sm btn-sura"
+                                                onclick="realizarExamen_evaluador('<?php echo $id_estudiante_ ?>', '<?php echo $id_modulo_ ?>')">Realizar</button>
+                                        <?php }
+                                    }
+                                ?>
+                                <?php
+                                if ($_SESSION['id_perfil'] != 2) {
+                                    if ($filaExamenes["fecha_realizacion"] == "" || $filaExamenes["fecha_realizacion"] == null) {
+                                        ?>
+                                        <button type="button" class="btn btn-raised btn-sm btn-danger" onclick="document.getElementById('fileInput_<?php echo $id_estudiante_ ?>_<?php echo $id_modulo_ ?>').click();">Cargar excel</button>
+                                        <input type="file" id="fileInput_<?php echo $id_estudiante_ ?>_<?php echo $id_modulo_ ?>" style="display: none;" accept=".xlsx" onchange="cargarExcel_evaluador('<?php echo $id_estudiante_ ?>', '<?php echo $id_modulo_ ?>', this)">
+                                    <?php }
+                                }
+                                ?>
                             </td>
+
                         </tr>
                         <?php
                     }
@@ -124,3 +131,70 @@ $resultadoExamenes = $conn->query($sqlExamenes);
         </table>
     </div>
 </div>
+
+<!-- MODAL Crear Examen -->
+<div class="modal fade" id="ListExamModulos" tabindex="-1" role="dialog" aria-labelledby="ListExamModulos" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="Modalcrear">Formato Evaliaciones en Excel</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="formularioEstudiante" method="post" style="width: 100%;">
+                    <fieldset>
+                        <legend><i class="far fa-user"></i> &nbsp;Selecciona una evaluación a exportar:</legend>
+                        <div class="container-fluid">
+                            <div class="row">
+                                 <?php
+                $sqlExamen = "SELECT e.id_examen, e.nombre_examen, e.descripcion, m.id_modulo, m.nombre nombre_modulo, e.tipo_examen
+                                FROM examenes e
+                                JOIN modulos m ON e.id_modulo = m.id_modulo
+                                WHERE  CURRENT_DATE() <= e.fecha_vigencia  AND e.activo and  e.tipo_examen = 'FINAL'
+                                ORDER BY m.nombre;";
+                $resultadoExamen = $conn->query($sqlExamen);
+                ?>
+                <div class="container-fluid">
+                    <div class="table-responsive">
+                        <table class="table table-hover table-bordered table-sm">
+                            <tbody>
+                                <?php
+                                if ($resultadoExamen->num_rows > 0) {
+                                    // Mostrar las preguntas
+                                    while ($filaExamen = $resultadoExamen->fetch_assoc()) {
+                                        $temp_examen =$filaExamen['id_examen'];
+                                        ?>
+                                        <tr class="text-center">
+                                            <td><?php echo $filaExamen["nombre_modulo"] ?></td>
+                                            <td><?php echo $filaExamen["nombre_examen"] ?> : <?php echo $filaExamen["descripcion"] ?></td>
+                                            <td><?php echo  $filaExamen["tipo_examen"] == "FINAL" ? "EXAMEN DE CAMPO" : $filaExamen["tipo_examen"]   ?></td>
+                                            <td>
+                                                <button type="button" class="btn btn-primary" id="btn_exportar-examen" onclick="exportarExamen('<?php echo $temp_examen ?>')"><i class="fas fa-file"></i></button>
+
+                                            </td>
+                                        </tr>
+                                    <?php
+                                    }
+                                }
+                                ?>                                
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                                
+                            </div>
+                        </div>
+                        <!-- Agrega los demás campos del formulario aquí -->
+                    </fieldset>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+

@@ -25,7 +25,7 @@ m.nombre  nombre_modulo,
 ea.salon,(select s.descripcion from salones s where s.id = ea.salon )salon_desc,
 CONCAT(i.nombres,' ', i.apellidos) nmb_instructor,
 COALESCE((select er.porcentaje from respuestas_estudiantes er where er.id_estudiante = ea.id_estudiante AND er.id_moludo = ea.id_modulo and er.id_examen = ea.id_examen ),'')porcentaje,
-COALESCE((select er.fecha_realizacion  from respuestas_estudiantes er where er.id_estudiante = ea.id_estudiante AND er.id_moludo = ea.id_modulo and er.id_examen = ea.id_examen ),'')fecha_realizacion    
+COALESCE((select DATE_FORMAT(er.fecha_realizacion, '%Y-%m-%d')  from respuestas_estudiantes er where er.id_estudiante = ea.id_estudiante AND er.id_moludo = ea.id_modulo and er.id_examen = ea.id_examen ),'')fecha_realizacion    
 FROM examenes_asignados ea
 JOIN examenes e ON ea.id_modulo = e.id_modulo AND  ea.id_examen = e.id_examen
 JOIN estudiantes es ON ea.id_estudiante = es.id_estudiante
