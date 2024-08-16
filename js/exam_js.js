@@ -237,37 +237,38 @@ function limpiar(){
     document.getElementById("id_estudent").value = 0;
 }
 
-function submitForm02(estudianteId,moduloId) {
+function submitForm02(estudianteId, moduloId) {
     const form = document.getElementById('form-wizard');
     const formData = new FormData(form);
     let respuestas = [];
     let pregunta = [];
-
+    let criterios = [];
+    
     for (let pair of formData.entries()) {
         // Recolecta las respuestas seleccionadas
-        pregunta.push(pair[0]); // Agregar solo el ID de la pregunta
-        respuestas.push(`${pair[0]}:${pair[1]}`); // Formato: id_pregunta=respuesta_seleccionada
+        if (pair[0].startsWith('criterio_')) {
+            criterios.push(pair[1]);
+        } else {
+            pregunta.push(pair[0]);
+            respuestas.push(`${pair[0]}:${pair[1]}`);
+        }
     }
 
-    // Concatenar las respuestas y preguntas como una cadena URL
-    const dataToSend = 'respuestas=' +respuestas.join(',') + '&preguntas=' + pregunta.join(',')+ '&estudianteId=' + estudianteId+ '&moduloId=' + moduloId;
+    const dataToSend = 'respuestas=' + respuestas.join(',') + '&preguntas=' + pregunta.join(',') + '&criterios=' + criterios.join(',') + '&estudianteId=' + estudianteId + '&moduloId=' + moduloId;
 
-    // Enviar las respuestas al archivo PHP usando AJAX
     const xhr = new XMLHttpRequest();
     xhr.open('POST', 'conexion/guardar_respuestasEva.php', true);
     xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
     xhr.onreadystatechange = function() {
         if (xhr.readyState === 4 && xhr.status === 200) {
-            // Respuesta del servidor (puede ser un mensaje de éxito o error)
             const resp = xhr.responseText;
-            alert(resp); // Mostrar mensaje de respuesta
-            
-            // Redireccionar al usuario a home.php
+            alert(resp);
             window.location.href = './home.php';
         }
     };
     xhr.send(dataToSend);
 }
+
 
 function checkAsistencia(checkbox) {
     var studentId = checkbox.getAttribute('data-student-id'); // Obtener el ID del estudiante
@@ -500,4 +501,72 @@ function descargarReporte02() {
             console.error('Error al descargar el archivo:', error);
         });
 }
+
+function exportarExamen(id_examen) {
+    fetch('conexion/exportar_examen.php', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: 'id_examen=' + encodeURIComponent(id_examen)
+    })
+    .then(response => {
+        if (!response.ok) {
+            return response.text().then(text => { throw new Error(text); });
+        }
+        return response.blob(); // Convertir la respuesta a un Blob
+    })
+    .then(blob => {
+        const url = window.URL.createObjectURL(blob); // Crear un URL temporal
+        const a = document.createElement('a'); // Crear un enlace
+        a.href = url;
+        a.download = 'examen_' + id_examen + '.xlsx'; // Nombre del archivo
+        document.body.appendChild(a);
+        a.click(); // Simular clic para descargar
+        a.remove(); // Limpiar el enlace
+        window.URL.revokeObjectURL(url); // Liberar el URL temporal
+    })
+    .catch(error => {
+        console.error('Error al descargar el archivo:', error);
+        alert('Error al descargar el archivo: ' + error.message);
+    });
+}
+
+function cargarExcel_evaluador(estudianteId, moduloId, inputFileElement) {
+    // El input file ya existe y es pasado como parámetro (inputFileElement)
+    
+    // Cuando se seleccione un archivo
+    const file = inputFileElement.files[0];
+    if (!file) {
+        alert("No se ha seleccionado ningún archivo.");
+        return;
+    }
+
+    // Crear un formulario para enviar el archivo
+    const formData = new FormData();
+    formData.append('archivo_excel', file);
+    formData.append('estudianteId', estudianteId);
+    formData.append('moduloId', moduloId);
+
+    // Enviar el archivo al servidor usando Fetch API
+    fetch('conexion/importar_exam_instructor.php', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.text())
+    .then(data => {
+        // Mostrar el resultado en un alert o en el DOM
+        alert(data);
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Ocurrió un error al procesar el archivo.');
+    });
+}
+
+
+
+
+
+
 
