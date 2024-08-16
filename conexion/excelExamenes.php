@@ -59,12 +59,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES["archivo"])) {
                 $vigencia = $rows[$i][$vigencia_index];
 
                 // Realiza la inserción en la base de datos
-                $sql = "INSERT INTO examenes (id_examen, nombre_examen, id_modulo, descripcion, tipo_examen, fecha_vigencia, activo) VALUES (?, ?, ?, ?, ?, ?)";
+               // Consulta SQL para insertar datos en la tabla de examenes
+$sql = "INSERT INTO examenes (id_examen,nombre_examen, id_modulo, descripcion, tipo_examen, fecha_vigencia, activo) VALUES (?,?, ?, ?, ?, ?, ?)";
 
-                // Preparar la declaración
-                $stmt = $conn->prepare($sql);
-                // Vincular parámetros
-                $stmt->bind_param("isisssi", $id ,$examen, $curso, $descripcion, $tipo, $vigencia, $activo);
+// Preparar la declaración
+$stmt = $conn->prepare($sql);
+
+// Vincular parámetros
+$stmt->bind_param("isisssi",$id,$examen, $curso, $descripcion, $tipo, $vigencia, $activo);
                 // Ejecuta la consulta
                 if ($stmt->execute()) {
                     $mensaje[$i] = ["$examen creado exitosamente"];

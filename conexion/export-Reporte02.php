@@ -46,8 +46,8 @@ $spreadsheet = new Spreadsheet();
 $sheet = $spreadsheet->getActiveSheet();
 
 // Establecer encabezados de columnas
-$sheet->setCellValue('A1', 'ID MÃ³dulo');
-$sheet->setCellValue('B1', 'Nombre MÃ³dulo');
+$sheet->setCellValue('A1', 'ID M¨®dulo');
+$sheet->setCellValue('B1', 'Nombre M¨®dulo');
 $sheet->setCellValue('C1', 'ID Examen');
 $sheet->setCellValue('D1', 'Nombre Examen');
 $sheet->setCellValue('E1', 'ID Pregunta');
@@ -82,7 +82,7 @@ header('Cache-Control: max-age=0');
 $writer = new Xlsx($spreadsheet);
 $writer->save('php://output');
 
-// Cerrar la conexiÃ³n a la base de datos
+// Cerrar la conexi¨®n a la base de datos
 $conn->close();
 exit();
 ?>

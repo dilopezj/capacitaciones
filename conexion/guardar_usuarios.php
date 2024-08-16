@@ -20,7 +20,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Verificar si el usuario ya existe por nombre de usuario o correo electrónico
     $sqlVerificarUsuario = "SELECT COUNT(*) AS count FROM usuarios WHERE nombre_usuario = ? ";
     $stmtVerificarUsuario = $conn->prepare($sqlVerificarUsuario);
-    $stmtVerificarUsuario->bind_param('ss', $usuario, $correo);
+    $stmtVerificarUsuario->bind_param('s', $usuario);
     $stmtVerificarUsuario->execute();
     $resultVerificarUsuario = $stmtVerificarUsuario->get_result();
     $rowVerificarUsuario = $resultVerificarUsuario->fetch_assoc();
@@ -28,7 +28,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // Si countUsuarios es mayor que 0, significa que ya existe un usuario con ese nombre de usuario o correo
     if ($countUsuarios > 0) {
-        echo "Error: El nombre de usuario  ya están registrados.";
+        echo "Error: El nombre de usuario  ya está registrado.";
     } else {
         // Preparar la consulta para insertar el nuevo usuario
         $sqlInsertUsuario = "INSERT INTO usuarios (nombre_usuario, correo_usuario, contrasena_usuario, id_perfil, identificacion, activo) VALUES (?, ?, ?, ?, ?, ?)";

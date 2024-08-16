@@ -2,13 +2,13 @@
 include 'conexion.php';
 session_start();
 
-// Verificar si se recibiÃ³ el ID del estudiante y el ID del curso
+// Verificar si se recibi¨® el ID del estudiante y el ID del curso
 if (isset($_POST['idEstudiante']) && isset($_POST['idCurso'])) {
     // Procesar el formulario de guardar
     $estudiante_id = $_POST['idEstudiante'];
     $idCurso = $_POST['idCurso'];
 
-    // Verificar si el ID del curso no estÃ¡ vacÃ­o
+    // Verificar si el ID del curso no est¨¢ vac¨ªo
     if ($idCurso != "" && $idCurso != null) {
         $sqlSelect = "SELECT e.id_examen FROM examenes e WHERE e.id_modulo = $idCurso ";
         $result = $conn->query($sqlSelect);
@@ -39,7 +39,7 @@ if (isset($_POST['idEstudiante']) && isset($_POST['idCurso'])) {
                 }
             }
         } else {
-            echo "No se encontraron exÃ¡menes asociados a este curso.";
+            echo "No se encontraron ex¨¢menes asociados a este curso.";
         }
     } else {
         echo "Error: Debe seleccionar un curso.";
@@ -48,6 +48,6 @@ if (isset($_POST['idEstudiante']) && isset($_POST['idCurso'])) {
     echo "Error: No se recibieron datos del formulario.";
 }
 
-// Cerrar la conexiÃ³n
+// Cerrar la conexi¨®n
 $conn->close();
 ?>
