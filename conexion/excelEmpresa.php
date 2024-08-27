@@ -60,15 +60,29 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES["archivo"])) {
                 $apl_contacto = $rows[$i][$apl_contacto_index];
                 $correo = $rows[$i][$correo_contacto_index];
 
-                // Realiza la inserción en la base de datos
-                $sql = "INSERT INTO empresas (nit, nombre, regional, ciudad, direccion, telefono, nmb_contacto, apl_contacto, correo_contacto) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ? )";
-                $stmt = $conn->prepare($sql);
-                $stmt->bind_param("issssssss", $nit, $nmb_empresa, $regional, $ciudad, $direccion, $telefono, $nmb_contacto, $apl_contacto, $correo);
-                // Ejecuta la consulta
-                if ($stmt->execute()) {
-                    $mensaje[$i] = ["$nmb_empresa creada exitosamente"];
+                // Verificar si el NIT ya existe
+                $check_sql = "SELECT COUNT(*) FROM empresas WHERE nit = ?";
+                $check_stmt = $conn->prepare($check_sql);
+                $check_stmt->bind_param("s", $nit);
+                $check_stmt->execute();
+                $check_stmt->bind_result($count);
+                $check_stmt->fetch();
+                $check_stmt->close();
+
+                if ($count > 0) {
+                    $mensaje[$i] = ["Error: El NIT $nit ya existe en la base de datos."];
                 } else {
-                    $mensaje[$i] = ["Error: " . $sql . "<br>" . $conn->error];
+                    // Realiza la inserción en la base de datos
+                    $sql = "INSERT INTO empresas (nit, nombre, regional, ciudad, direccion, telefono, nmb_contacto, apl_contacto, correo_contacto) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ? )";
+                    $stmt = $conn->prepare($sql);
+                    $stmt->bind_param("sssssssss", $nit, $nmb_empresa, $regional, $ciudad, $direccion, $telefono, $nmb_contacto, $apl_contacto, $correo);
+
+                    // Ejecuta la consulta
+                    if ($stmt->execute()) {
+                        $mensaje[$i] = ["$nmb_empresa creada exitosamente"];
+                    } else {
+                        $mensaje[$i] = ["Error: " . $stmt->error];
+                    }
                 }
             }
         }
